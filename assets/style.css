@@ -51,6 +51,7 @@ h2 { line-height:1.4; }
 .start-card-desc { font-size:.9rem; color:var(--muted); line-height:1.5; }
 .start-here, .year-gap { color:var(--muted); font-size:.95rem; }
 .year-gap { margin:14px 0 0; }
+.year-gap.note { margin:10px 0 16px; font-size:.88rem; }
 .prose { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:clamp(18px,4vw,42px); }
 .prose h2 { font-size:1.25rem; margin:1.6em 0 .5em; }
 .prose h2:first-child { margin-top:0; }
@@ -95,7 +96,12 @@ h2 { line-height:1.4; }
 .type-filter[hidden] { display:none; }
 .year-nav small { color:var(--muted); font-size:.78rem; }
 .year-nav button:hover small, .year-nav button.active small { color:var(--accent-contrast); opacity:.95; }
-.year-nav button[hidden], .month-section[hidden], .year-section[hidden], .entry[hidden] { display:none; }
+.year-nav button[hidden], .month-section[hidden], .year-section[hidden], .entry[hidden], .no-results[hidden] { display:none !important; }
+.no-results { text-align:center; padding:48px 20px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:24px 0 32px; }
+.no-results-title { color:var(--ink); font-weight:700; font-size:1.15rem; margin:0 0 8px; }
+.no-results-help { color:var(--muted); font-size:.92rem; margin:0 0 18px; line-height:1.6; }
+.no-results-reset, #no-results-reset { display:inline-flex; align-items:center; justify-content:center; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:9px 20px; min-height:44px; font:inherit; cursor:pointer; font-weight:600; }
+.no-results-reset:hover, #no-results-reset:hover { opacity:.92; }
 .year-section { scroll-margin-top:120px; margin:34px 0 42px; }
 .back-to-top { position:fixed; right:16px; bottom:16px; z-index:20; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:10px 14px; text-decoration:none; box-shadow:0 4px 16px var(--shadow); opacity:0; visibility:hidden; pointer-events:none; }
 .back-to-top.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
