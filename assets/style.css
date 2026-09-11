@@ -86,6 +86,8 @@ h2 { line-height:1.4; }
 .lede, .meta { color:var(--muted); }
 .hero-intro { color:var(--muted); font-size:1.02rem; margin:14px 0 24px; line-height:1.75; }
 .start-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin:20px 0 28px; }
+.topic-hub { margin:28px 0 0; }
+.topic-hub h2 { color:var(--muted); font-size:1rem; font-weight:600; margin:0 0 4px; }
 .start-card { display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; text-decoration:none; transition:border-color .15s ease, transform .15s ease; }
 .start-card:hover { border-color:var(--accent); transform:translateY(-1px); }
 .start-card-tag { display:inline-block; align-self:flex-start; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); background:var(--surface-subtle); padding:2px 8px; border-radius:6px; margin-bottom:2px; }
@@ -101,6 +103,9 @@ h2 { line-height:1.4; }
 .guide-list { margin:10px 0 18px; padding-left:1.2em; }
 .guide-list li { margin:8px 0; }
 .cite { color:var(--muted); font-size:.92rem; }
+.provenance { margin:10px 0 20px; padding-left:1.2em; }
+.provenance li { margin:8px 0; }
+.provenance-step { font-weight:650; }
 .official-links { margin:28px 0 0; }
 .official-links h2 { color:var(--muted); margin:0 0 8px; font-size:1rem; font-weight:600; }
 .official-links-row { display:flex; flex-wrap:wrap; gap:6px 16px; margin:0; }
