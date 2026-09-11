@@ -88,6 +88,9 @@ h2 { line-height:1.4; }
 .start-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin:20px 0 28px; }
 .topic-hub { margin:28px 0 0; }
 .topic-hub h2 { color:var(--muted); font-size:1rem; font-weight:600; margin:0 0 4px; }
+.topic-extra { color:var(--muted); font-size:.9rem; margin:2px 0 22px; }
+.topic-extra a { text-decoration:none; }
+.topic-extra a:hover { text-decoration:underline; }
 .start-card { display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; text-decoration:none; transition:border-color .15s ease, transform .15s ease; }
 .start-card:hover { border-color:var(--accent); transform:translateY(-1px); }
 .start-card-tag { display:inline-block; align-self:flex-start; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); background:var(--surface-subtle); padding:2px 8px; border-radius:6px; margin-bottom:2px; }
@@ -103,6 +106,13 @@ h2 { line-height:1.4; }
 .guide-list { margin:10px 0 18px; padding-left:1.2em; }
 .guide-list li { margin:8px 0; }
 .cite { color:var(--muted); font-size:.92rem; }
+.cite-block { margin:18px 0 0; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface-subtle); }
+.cite-text { font-size:.88rem; color:var(--muted); line-height:1.6; margin:0 0 10px; word-break:break-word; }
+.cite-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.cite-btn { font:inherit; cursor:pointer; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--accent); padding:4px 10px; font-size:.85rem; min-height:36px; }
+.cite-btn:hover { border-color:var(--accent); }
+.cite-btn.is-ok { color:var(--accent-contrast); background:var(--accent); border-color:var(--accent); }
+.cite-btn.is-error { color:#a33; border-color:#c66; background:var(--surface); }
 .provenance { margin:10px 0 20px; padding-left:1.2em; }
 .provenance li { margin:8px 0; }
 .provenance-step { font-weight:650; }
