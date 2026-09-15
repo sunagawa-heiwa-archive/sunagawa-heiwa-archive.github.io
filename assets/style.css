@@ -133,12 +133,8 @@ h2 { line-height:1.4; }
 .search { margin:20px 0 14px; }
 .search label { display:block; color:var(--muted); font-size:.9rem; margin-bottom:5px; }
 .search input { width:min(100%, 620px); min-height:44px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:var(--surface); color:var(--ink); font:inherit; }
-.no-results { display:none; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:28px 20px; margin:24px 0; text-align:center; }
+.no-results { display:none; text-align:center; padding:48px 20px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:24px 0 32px; }
 .no-results:not([hidden]) { display:block; }
-.no-results h2 { margin:0 0 8px; font-size:1.15rem; color:var(--ink); }
-.no-results p { margin:0 0 16px; color:var(--muted); font-size:.95rem; }
-#no-results-reset { display:inline-flex; align-items:center; min-height:44px; padding:8px 18px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--accent); font:inherit; font-weight:600; cursor:pointer; }
-#no-results-reset:hover { background:var(--accent); color:var(--accent-contrast); border-color:var(--accent); }
 .language-nav, .type-nav { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 12px; }
 .language-nav-label, .type-nav-label { width:100%; color:var(--muted); font-size:.9rem; margin-bottom:2px; }
 .language-filter, .type-filter { color:var(--accent); border:1px solid var(--line); border-radius:999px; padding:8px 12px; min-height:44px; background:var(--surface); font:inherit; cursor:pointer; }
@@ -159,7 +155,6 @@ h2 { line-height:1.4; }
 .year-nav small { color:var(--muted); font-size:.78rem; }
 .year-nav button:hover small, .year-nav button.active small { color:var(--accent-contrast); opacity:.95; }
 .year-nav button[hidden], .month-section[hidden], .year-section[hidden], .entry[hidden], .no-results[hidden] { display:none !important; }
-.no-results { text-align:center; padding:48px 20px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:24px 0 32px; }
 .no-results-title { color:var(--ink); font-weight:700; font-size:1.15rem; margin:0 0 8px; }
 .no-results-help { color:var(--muted); font-size:.92rem; margin:0 0 18px; line-height:1.6; }
 .no-results-reset, #no-results-reset { display:inline-flex; align-items:center; justify-content:center; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:9px 20px; min-height:44px; font:inherit; cursor:pointer; font-weight:600; }
