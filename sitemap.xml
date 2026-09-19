@@ -216,4 +216,16 @@
   <url><loc>https://sunagawa-heiwa-archive.github.io/articles/fc2-15.html</loc><lastmod>2012-01-01</lastmod></url>
   <url><loc>https://sunagawa-heiwa-archive.github.io/articles/fc2-5.html</loc><lastmod>2011-12-29</lastmod></url>
   <url><loc>https://sunagawa-heiwa-archive.github.io/articles/fc2-4.html</loc><lastmod>2011-01-01</lastmod></url>
+  <url>
+    <loc>https://sunagawa-heiwa-archive.github.io/changelog.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sunagawa-heiwa-archive.github.io/reading-paths.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
