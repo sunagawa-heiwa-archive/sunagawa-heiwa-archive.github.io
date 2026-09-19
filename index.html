@@ -422,7 +422,58 @@
       languageButtons.forEach((button) => { const active = button.dataset.languageFilter === language; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
       typeButtons.forEach((button) => { const active = button.dataset.typeFilter === type; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
       yearButtons.forEach((button) => { const active = button.dataset.yearFilter === year; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
-      entries.forEach((entry) => { entry.hidden = !hasLanguage(entry) || !hasType(entry) || !hasSearch(entry) || (year !== 'all' && entry.dataset.year !== year); });
+      const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const escapeHtml = (s) => s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t));
+
+      entries.forEach((entry) => {
+        const isHidden = !hasLanguage(entry) || !hasType(entry) || !hasSearch(entry) || (year !== 'all' && entry.dataset.year !== year);
+        entry.hidden = isHidden;
+
+        const titleEl = entry.querySelector('.entry-title');
+        if (!titleEl) return;
+        if (!titleEl.dataset.origText) titleEl.dataset.origText = titleEl.textContent;
+
+        const existingSnippet = entry.querySelector('.search-snippet');
+
+        if (!isHidden && query) {
+          const orig = titleEl.dataset.origText;
+          const safeQ = escapeRegExp(query);
+          const regex = new RegExp(`(${safeQ})`, 'gi');
+          
+          // 1. Highlight in title if present
+          if (regex.test(orig)) {
+            titleEl.innerHTML = escapeHtml(orig).replace(new RegExp(`(${escapeRegExp(escapeHtml(query))})`, 'gi'), '<mark class="search-highlight">$1</mark>');
+            if (existingSnippet) existingSnippet.remove();
+          } else {
+            // Title didn't match directly, restore title text
+            titleEl.textContent = orig;
+            // 2. Extract snippet from entry.dataset.search if query in body
+            const bodyText = entry.dataset.search || '';
+            const matchIdx = bodyText.toLowerCase().indexOf(query);
+            if (matchIdx !== -1) {
+              const start = Math.max(0, matchIdx - 35);
+              const end = Math.min(bodyText.length, matchIdx + query.length + 35);
+              let snippet = (start > 0 ? '…' : '') + bodyText.slice(start, end).trim() + (end < bodyText.length ? '…' : '');
+              const safeSnippet = escapeHtml(snippet).replace(new RegExp(`(${escapeRegExp(escapeHtml(query))})`, 'gi'), '<mark class="search-highlight">$1</mark>');
+              
+              if (existingSnippet) {
+                existingSnippet.innerHTML = safeSnippet;
+              } else {
+                const snipEl = document.createElement('span');
+                snipEl.className = 'search-snippet';
+                snipEl.innerHTML = safeSnippet;
+                entry.appendChild(snipEl);
+              }
+            } else if (existingSnippet) {
+              existingSnippet.remove();
+            }
+          }
+        } else {
+          // Restore plain title and remove snippets when query cleared or entry hidden
+          titleEl.textContent = titleEl.dataset.origText;
+          if (existingSnippet) existingSnippet.remove();
+        }
+      });
       months.forEach((month) => {
         const count = month.querySelectorAll('.entry:not([hidden])').length;
         month.hidden = count === 0;
@@ -487,6 +538,7 @@
         if (query) url.searchParams.set('q', requestedQuery.trim());
         else url.searchParams.delete('q');
         window.history.replaceState({}, '', url);
+        try { sessionStorage.setItem('archive_last_search', window.location.search); } catch(e){}
       }
     };
     const params = () => new URLSearchParams(window.location.search);
