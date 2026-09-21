@@ -141,7 +141,8 @@ h2 { line-height:1.4; }
 .language-nav, .type-nav { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 12px; }
 .language-nav-label, .type-nav-label { width:100%; color:var(--muted); font-size:.9rem; margin-bottom:2px; }
 .language-filter, .type-filter { color:var(--accent); border:1px solid var(--line); border-radius:999px; padding:8px 12px; min-height:44px; background:var(--surface); font:inherit; cursor:pointer; }
-.language-filter:hover, .language-filter.active, .type-filter:hover, .type-filter.active { color:var(--accent-contrast); border-color:var(--accent); background:var(--accent); }
+.language-filter:hover:not(:disabled), .language-filter.active, .type-filter:hover:not(:disabled), .type-filter.active { color:var(--accent-contrast); border-color:var(--accent); background:var(--accent); }
+.language-filter:disabled, .type-filter:disabled, .year-nav button:disabled { opacity:.45; cursor:not-allowed; }
 .language-filter small, .type-filter small { font-size:.78rem; opacity:.8; }
 .filter-status { display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--muted); font-size:.92rem; margin:10px 0 4px; }
 #reset-filters { color:var(--accent); border:1px solid var(--line); border-radius:999px; padding:8px 12px; min-height:44px; background:var(--surface); font:inherit; cursor:pointer; }
@@ -152,12 +153,11 @@ h2 { line-height:1.4; }
 .year-nav-buttons { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .year-nav-label { width:100%; color:var(--muted); font-size:.9rem; margin-bottom:2px; }
 .year-nav button { display:inline-flex; align-items:center; gap:7px; color:var(--accent); border:1px solid var(--line); border-radius:999px; padding:8px 12px; min-height:44px; background:var(--surface); font:inherit; cursor:pointer; }
-.year-nav button:hover, .year-nav button.active { color:var(--accent-contrast); border-color:var(--accent); background:var(--accent); }
+.year-nav button:hover:not(:disabled), .year-nav button.active { color:var(--accent-contrast); border-color:var(--accent); background:var(--accent); }
 .year-nav button.active:focus-visible, .language-filter.active:focus-visible, .type-filter.active:focus-visible { outline-color:var(--focus-ring); }
-.type-filter[hidden] { display:none; }
 .year-nav small { color:var(--muted); font-size:.78rem; }
-.year-nav button:hover small, .year-nav button.active small { color:var(--accent-contrast); opacity:.95; }
-.year-nav button[hidden], .month-section[hidden], .year-section[hidden], .entry[hidden], .no-results[hidden] { display:none !important; }
+.year-nav button:hover:not(:disabled) small, .year-nav button.active small { color:var(--accent-contrast); opacity:.95; }
+.month-section[hidden], .year-section[hidden], .entry[hidden], .no-results[hidden] { display:none !important; }
 .no-results-title { color:var(--ink); font-weight:700; font-size:1.15rem; margin:0 0 8px; }
 .no-results-help { color:var(--muted); font-size:.92rem; margin:0 0 18px; line-height:1.6; }
 .no-results-reset, #no-results-reset { display:inline-flex; align-items:center; justify-content:center; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:9px 20px; min-height:44px; font:inherit; cursor:pointer; font-weight:600; }
