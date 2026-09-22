@@ -133,7 +133,7 @@ h2 { line-height:1.4; }
 .stats span:first-child { padding-left:0; border-left:0; color:var(--ink); font-weight:600; }
 .filters { display:flex; gap:10px; flex-wrap:wrap; margin:24px 0 14px; }
 .filters a { border:1px solid var(--line); border-radius:999px; padding:4px 12px; text-decoration:none; background:var(--surface); }
-.search { margin:20px 0 14px; }
+.search { position:sticky; top:0; z-index:9; background:var(--paper); margin:20px -20px 14px; padding:10px 20px 12px; border-bottom:1px solid var(--line); }
 .search label { display:block; color:var(--muted); font-size:.9rem; margin-bottom:5px; }
 .search input { width:min(100%, 620px); min-height:44px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:var(--surface); color:var(--ink); font:inherit; }
 .no-results { display:none; text-align:center; padding:48px 20px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:24px 0 32px; }
@@ -162,7 +162,7 @@ h2 { line-height:1.4; }
 .no-results-help { color:var(--muted); font-size:.92rem; margin:0 0 18px; line-height:1.6; }
 .no-results-reset, #no-results-reset { display:inline-flex; align-items:center; justify-content:center; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:9px 20px; min-height:44px; font:inherit; cursor:pointer; font-weight:600; }
 .no-results-reset:hover, #no-results-reset:hover { opacity:.92; }
-.year-section { scroll-margin-top:120px; margin:34px 0 42px; }
+.year-section { scroll-margin-top:180px; margin:34px 0 42px; }
 .back-to-top { position:fixed; right:16px; bottom:16px; z-index:20; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:10px 14px; text-decoration:none; box-shadow:0 4px 16px var(--shadow); opacity:0; visibility:hidden; pointer-events:none; }
 .back-to-top.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
 .back-to-top:focus-visible { outline-color:var(--focus-ring); outline-offset:3px; }
@@ -171,7 +171,7 @@ h2 { line-height:1.4; }
 .month-section { margin:24px 0 28px; }
 .month-section h3 { color:var(--accent); margin:0 0 10px; font-size:1.08rem; }
 .entry-list { display:grid; gap:10px; }
-.entry { display:block; border:1px solid var(--line); border-radius:10px; padding:13px 16px; background:var(--surface); text-decoration:none; scroll-margin-top:120px; }
+.entry { display:block; border:1px solid var(--line); border-radius:10px; padding:13px 16px; background:var(--surface); text-decoration:none; scroll-margin-top:180px; }
 .entry:hover { border-color:var(--accent); }
 .entry-title { display:block; color:var(--ink); font-weight:650; }
 .entry-meta { color:var(--muted); font-size:.9rem; }
@@ -266,7 +266,7 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
   .year-nav-summary::after { content:""; width:.45em; height:.45em; margin-left:auto; border-right:2px solid var(--accent); border-bottom:2px solid var(--accent); transform:rotate(45deg); flex-shrink:0; }
   .year-nav-details[open] .year-nav-summary::after { transform:rotate(-135deg); margin-top:6px; }
   .year-nav-buttons { padding:6px 0 4px; }
-  .year-section, .entry { scroll-margin-top:72px; }
+  .year-section, .entry { scroll-margin-top:170px; }
   .article-nav { grid-template-columns:1fr; }
   .article-nav-older, .article-nav-newer { grid-column:1; text-align:left; }
 }
