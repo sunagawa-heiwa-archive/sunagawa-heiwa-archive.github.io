@@ -581,7 +581,18 @@
     window.matchMedia('(max-width:700px)').addEventListener('change', syncYearPanel);
     const backToTop = document.querySelector('.back-to-top');
     if (backToTop) {
-      const toggleBackToTop = () => backToTop.classList.toggle('is-visible', window.scrollY > 800);
+      let lastScrollY = window.scrollY;
+      let direction = 'down';
+      const toggleBackToTop = () => {
+        const y = window.scrollY;
+        const delta = y - lastScrollY;
+        if (Math.abs(delta) > 5) {
+          direction = delta < 0 ? 'up' : 'down';
+          lastScrollY = y;
+        }
+        const nearBottom = y + window.innerHeight > document.documentElement.scrollHeight - 800;
+        backToTop.classList.toggle('is-visible', y > 800 && (direction === 'up' || nearBottom));
+      };
       window.addEventListener('scroll', toggleBackToTop, { passive: true });
       toggleBackToTop();
     }
