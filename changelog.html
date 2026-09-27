@@ -2,26 +2,29 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>更新履歴と訂正・削除方針 / Changelog & Policy | Sunagawa Heiwa Hiroba</title>
 <meta name="description" content="砂川平和ひろば公開記事アーカイブの更新履歴、保守記録、および掲載内容の訂正・削除・プライバシー保護方針について。">
-<meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#496f61">
+<meta name="robots" content="index,follow,max-image-preview:large"><meta name="color-scheme" content="light dark"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#496f61"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#181b19"><script>(function(){try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <link rel="canonical" href="https://sunagawa-heiwa-archive.github.io/changelog.html">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Sunagawa Heiwa Hiroba">
 <meta property="og:locale" content="ja_JP"><meta property="og:title" content="更新履歴と訂正・削除方針 / Changelog & Policy">
 <meta property="og:description" content="砂川平和ひろば公開記事アーカイブの更新履歴、保守記録、および掲載内容の訂正・削除・プライバシー保護方針について。">
 <meta property="og:url" content="https://sunagawa-heiwa-archive.github.io/changelog.html">
 <meta property="og:image" content="https://sunagawa-heiwa-archive.github.io/assets/og-default.png">
-<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="更新履歴と訂正・削除方針 / Changelog & Policy"><meta name="twitter:description" content="砂川平和ひろば公開記事アーカイブの更新履歴、保守記録、および掲載内容の訂正・削除・プライバシー保護方針について。"><meta name="twitter:image" content="https://sunagawa-heiwa-archive.github.io/assets/og-default.png">
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="shortcut icon" href="favicon.ico"><link rel="alternate" type="application/atom+xml" title="Sunagawa Heiwa Hiroba archive feed" href="feed.xml">
 <link rel="stylesheet" href="assets/style.css">
+<script src="assets/theme.js" defer></script>
 </head>
 <body id="top">
 <a class="skip-link" href="#changelog">Skip to content / 本文へ</a>
 <div class="wrap">
 <header>
 <nav class="site-nav" aria-label="Site / サイト">
-<a href="./">Archive / アーカイブ</a>
+<a href="./">Home / トップ</a>
+<a href="archive.html">Articles / 記事一覧</a>
 <a href="guide.html">Guide / 入門</a>
-<a href="case-timeline.html">Case timeline / 国賠年表</a>
+<a href="case-timeline.html">国賠訴訟の経過 / Lawsuit timeline</a>
 <a href="about.html">About / このアーカイブについて</a>
-</nav>
+<div class="theme-switch" role="group" aria-label="Theme / テーマ切替"><button type="button" class="theme-btn" data-theme-val="light" aria-pressed="false" title="Light / ライト"><span aria-hidden="true">☀️</span> <span>Light</span></button><button type="button" class="theme-btn" data-theme-val="dark" aria-pressed="false" title="Dark / ダーク"><span aria-hidden="true">🌙</span> <span>Dark</span></button><button type="button" class="theme-btn" data-theme-val="auto" aria-pressed="false" title="Auto / 自動"><span aria-hidden="true">💻</span> <span>Auto</span></button></div></nav>
 <nav class="topics-nav" aria-label="Topics / テーマ">
 <a href="sunagawa-incident.html">砂川事件とは / Sunagawa Incident</a>
 <a href="date-judgment.html">伊達判決とは / Date Judgment</a>
@@ -47,11 +50,36 @@
 
 <h2>更新履歴 / Maintenance Log</h2>
 
+<h3>2026-09-27</h3>
+<ul class="guide-list">
+<li><strong>更新履歴の補記</strong>：2026-09-11以降に公開された変更のうち、本ページに記録されていなかったものを下の日付ごとに追記しました（当時のコミット履歴と、現在のファイルの状態を突き合わせて確認）。記録方針はこれまでどおり、オンラインで確認できる変更のみを記録します。</li>
+<li><strong>テーマ切替の欠落を修正</strong>：本ページと読書案内（reading-paths.html）にはテーマ切替（Light / Dark / Auto）が入っておらず、端末の設定に自動追従する状態でした。他の編集ページと同じ切替ボタンとスクリプトを追加しました。</li>
+<li><strong>共有リンクの条件と表示を一致させる修正</strong>：共有されたURLが、他の条件と同時には成立しない絞り込み（例：該当記事が0件になる年）を含む場合、画面は「すべて」に戻って表示されるのにURLには元の条件が残っていました。初回表示の時点で、URLを実際の表示条件に揃えるようにしました。</li>
+<li><strong>トップページの構造改善</strong>：トップページの本文を main 要素で囲み、スクリーンリーダーの地標から本文にたどれるようにしました。</li>
+<li><strong>ナビゲーションの名称整理</strong>：サイト上部のナビで、国賠訴訟の経過ページの名称を「国賠訴訟の経過 / Lawsuit timeline」に変更しました。従来は「年表」を名乗っており、砂川闘争の通史をたどる年表ページと、名前だけでは区別しにくい状態でした。</li>
+<li><strong>トップページを門前（短い案内）と記事一覧に分割</strong>：トップページが、テーマカード・絞り込み・全208件の一覧を1ページに抱えていたため、モバイルでは記事検索にたどり着くまでに約3画面、ページ全体は約47画面分の長さになっていました。記事の一覧と検索は <a href="archive.html">archive.html（全記事一覧と検索）</a> に移し、トップページは案内と入口だけの短いページにしました。既存の共有リンク（例：<code>/?q=伊達判決</code>）や <code>/#article-search</code> は、そのまま archive.html の該当表示へ引き継がれます。ナビには「Articles / 記事一覧」を追加し、先頭の項目を「Home / トップ」に改めました。</li>
+<li><strong>記事末尾ナビの空きを修正</strong>：最新記事のように前後の一方しかない記事で、記事末尾の「前後の記事」が二列グリッドの片側だけを占め、隣に空きができていました。相手がない場合は1件が横幅いっぱいに広がるようにしました。</li>
+<li><strong>本ページと読書案内のメタデータ統一</strong>：両ページに、他の編集ページと同じSNSカード（twitter:card ほか）、ショートカットアイコン、Atomフィードへのリンクを追加しました。</li>
+</ul>
+
+<h3>2026-09-22</h3>
+<ul class="guide-list">
+<li><strong>一覧の操作性</strong>：記事一覧の検索ボックスと年フィルターを画面上部に固定し、長い一覧をスクロールしている途中でも条件を変更できるようにしました。</li>
+<li><strong>保守</strong>：各ページのスタイルシート参照から、手動のキャッシュ用パラメータ（?v=…）を外しました。</li>
+</ul>
+
 <h3>2026-09-21</h3>
 <ul class="guide-list">
 <li><strong>訂正・削除の連絡窓口を修正</strong>：方針セクションの連絡先が、ひろば本体のアドレス（sunagawa.heiwa@）になっていました。アーカイブ保守担当のアドレス（zezelunar@）に修正し、ひろば本体への問い合わせ先も併記しました。</li>
 <li><strong>読書案内ページへの導線を追加</strong>：reading-paths.html へのリンクをトップページ（テーマカード）と入門ガイドに追加しました。あわせて、全ページのフッターに本ページ（訂正・削除依頼）への直リンクを設置しました。</li>
 <li><strong>更新履歴の記述を実態に合わせて修正</strong>：09-19の2件（読書案内の直結、Wayback Machine検証の開始）および09-07の1件（alt属性の「正規化」）について、実際のオンライン状態と異なる記述を修正しました。今後、更新履歴にはオンラインで検証済みの変更のみを記録します。</li>
+<li><strong>絞り込みの行き止まりを解消</strong>：該当記事が0件の絞り込みボタンは、年と種類では消え、言語では押せて空の結果に至る、という不統一がありました。0件のボタンは表示したまま選択不可（グレー表示）に統一しました。</li>
+<li><strong>「先頭へ戻る」ボタンの挙動を変更</strong>：常時表示をやめ、上方向にスクロールした時と最下部付近でのみ表示するようにしました（記事カードのクリックを妨げないため）。</li>
+</ul>
+
+<h3>2026-09-20</h3>
+<ul class="guide-list">
+<li><strong>編集ページの日本語優先化</strong>：段落ごとに英日を併記していた編集ページを、日本語本文に英語の要約（Research Guideへの案内）を添える構成に統一しました。あわせて、本ページと読書案内に「Topics / テーマ」ナビを追加しました。</li>
 </ul>
 
 <h3>2026-09-19</h3>
@@ -59,7 +87,24 @@
 <li><strong>記事回遊性の向上（関連記事）</strong>：各記事ページ下部に、同種別（集会、訴訟、解説等）や同年次に発表された「関連記事」一覧を自動提示する導線を追加しました。</li>
 <li><strong>一覧復帰時の検索状態保持</strong>：記事ページから「← アーカイブ一覧」へ戻る際、直前の検索キーワードや絞り込み条件（言語・種別等）を自動的に復元するナビゲーションを導入しました。</li>
 <li><strong>読書案内と目的別ルートの新設</strong>：教員向け（3選）や記者向け（5選）の目的別精選ルート「おすすめの読書案内（reading-paths.html）」を新設しました。なお、公開時はトップページ・入門ガイドからのリンクが漏れており孤立状態でした。2026-09-21に両ページからのリンクを追加しています。</li>
+<li><strong>保存画像の原寸復元</strong>：圧縮していた保存画像304点を元の解像度に戻し、記事内での画像表示を調整しました。</li>
 <li><strong>第三者機関（Internet Archive）による保全</strong>：収録全208本の元ページURLについて、Wayback Machine (Internet Archive) へのクロスアーカイブを計画・準備しています。2026-09-21時点ではまだ実施されておらず、記事ページにWaybackへのリンクはありません。実施後にあらためて記録します。</li>
+</ul>
+
+<h3>2026-09-15</h3>
+<ul class="guide-list">
+<li><strong>「Topics / テーマ」ナビの追加</strong>：主要ページ（収録記事208本と404ページを含む）から、砂川事件とは・伊達判決とは・砂川闘争年表・Research guide へ直接たどれるようにしました。</li>
+<li><strong>トップページに位置づけを明示</strong>：「公開記事の保全庫であり、ひろばの公式トップではありません」の一文をヒーロー部に追加しました。</li>
+<li><strong>絞り込みの改善</strong>：言語フィルターの件数が検索語・年・種類に連動して更新されるようにし、該当0件のときの文言を専用のものに変更しました。ラベルも「Article language / 記事の言語」に改めました。</li>
+<li><strong>記事ページの改善</strong>：引用用のブロックとボタンを本文の途中から記事末へ移し、「検索に戻る」導線を追加しました。</li>
+<li><strong>年表ページの見出し構造を整理</strong>：砂川闘争年表の25項目を、節見出し（h2）の下の h3 に整えました。</li>
+<li><strong>機械可読メタデータの配信</strong>：articles-metadata.csv / articles-metadata.json（208件）の配信を開始しました。</li>
+</ul>
+
+<h3>2026-09-11</h3>
+<ul class="guide-list">
+<li><strong>編集ページの追加</strong>：砂川闘争年表（1609〜1977年）と英語向けの Research Guide を新設し、記事ページに引用用のコピー機能（引用形式・引用文・アーカイブURLのコピー）を追加しました。</li>
+<li><strong>連絡先の追加</strong>：アーカイブ保守担当の連絡先（zezelunar@）を追加し、ひろば本体用アドレスと用途を分けました。</li>
 </ul>
 
 <h3>2026-09-07</h3>
@@ -77,7 +122,7 @@
 </main>
 
 <footer>
-<a href="./">Archive / アーカイブトップへ戻る</a> · <a href="about.html">About / このアーカイブについて</a>
+<a href="./">Home / トップへ戻る</a> · <a href="archive.html">Articles / 記事一覧</a> · <a href="about.html">About / このアーカイブについて</a>
 </footer>
 </div>
 </body>
