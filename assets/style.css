@@ -199,6 +199,11 @@ article h1 { margin-bottom:5px; }
 .article-nav-label { color:var(--muted); font-size:.82rem; }
 .article-nav-title { color:var(--ink); font-weight:650; line-height:1.45; }
 .article-nav-back { grid-column:1 / -1; }
+/* The newest and oldest articles only have one neighbour. Without these rules
+   the lone link would sit in a half-width column and leave an empty slot beside
+   it (audit item D1). Browsers without :has() keep the previous look. */
+.article-nav:not(:has(.article-nav-newer)) .article-nav-older { grid-column:1 / -1; }
+.article-nav:not(:has(.article-nav-older)) .article-nav-newer { grid-column:1 / -1; }
 .related-links { margin:18px 0 0; }
 .related-links a { display:inline-flex; align-items:center; min-height:44px; }
 .timeline-summary { border:1px solid var(--line); border-radius:12px; padding:18px 20px; background:var(--surface-subtle); margin:24px 0 30px; }
