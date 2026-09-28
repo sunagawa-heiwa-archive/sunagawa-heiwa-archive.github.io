@@ -1,4 +1,4 @@
-<!-- Replace `ISSUE-ID` with the actual Linear issue key. Do not start work without an issue whose Description contains acceptance criteria. -->
+<!-- Normally replace `ISSUE-ID` with the actual Linear issue key. Do not start work without an issue whose Description contains acceptance criteria. For Tera-requested governance-document-only maintenance allowed by AGENTS.md §1, use `TASK — short summary` instead and do not invent an issue key. -->
 Fixes ISSUE-ID
 
 ## What changed (plain language, 2–3 sentences)
@@ -23,7 +23,7 @@ Fixes ISSUE-ID
 
 - [ ] No secrets, `.env` values, tokens, or personal data in the diff or PR text
 - [ ] New dependencies, external scripts, or network calls: none — or list exact name, version, source, and reason
-- [ ] Protected files were changed only when named in the issue
+- [ ] Protected files were named in the issue or in Tera's explicit governance-only request
 
 ## What could break (plain language)
 

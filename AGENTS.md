@@ -60,8 +60,8 @@ An agent that implemented a change must not review it. Tera owns the final merge
 
 ## 1. Before writing code
 
-1. **Every change starts from a Linear issue.** Its Description must include the user story, acceptance criteria, out-of-scope items, references, and UAT steps. An assignee or issue title is not acceptance criteria. If the issue is missing or its Description is empty/incomplete, stop and ask Tera to complete it; do not start from a chat prompt alone.
-2. **Restate the task** in at most 5 bullets: what will change, what will not, and which files you expect to touch. Wait for Tera's OK before coding. The fast lane applies only to one-file, roughly 20-line, no-logic changes; the Linear issue, checks, PR, and review gate still apply.
+1. **Every change starts from a Linear issue.** Its Description must include the user story, acceptance criteria, out-of-scope items, references, and UAT steps. An assignee or issue title is not acceptance criteria. If the issue is missing or its Description is empty/incomplete, stop and ask Tera to complete it; do not start from a chat prompt alone. Narrow exception: Tera may directly request governance-document-only maintenance (AGENTS.md, CLAUDE.md, reviewer instructions, or PR templates). Record that explicit request as `TASK — ...` in the PR; do not use this exception for application code, site content, or archive data.
+2. **Restate the task** in at most 5 bullets: what will change, what will not, and which files you expect to touch. Wait for Tera's OK before coding. The fast lane may skip that wait only for one-file, roughly 20-line, no-logic changes; the Linear issue (or narrow governance exception above), checks, PR, and review gate still apply.
 3. **Do not infer the implementer from the assignee.** The assignee is the human accountable for the issue. The `impl:codex`, `impl:orca`, or `impl:human` label identifies who will implement it. Tera sets the label and moves the issue to In Progress when work starts.
 4. **Use one issue, one branch, one PR.** Start from the latest base branch (see *This repo*): `git fetch origin && git switch -c <type>/<ISSUE-ID>-<short-slug> origin/<base>`. For Orca parallel work, use one worktree named for the issue; never run two agents on the same issue at once.
 
@@ -97,7 +97,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 ## 5. Commits, PRs, and mandatory review gate
 
 - Commit format: `type(scope): summary [ISSUE-ID]`. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
-- PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it.
+- PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it. For the narrow governance-only exception in §1, use `[TASK] short summary` and start the body with `TASK — short summary`; do not invent an issue key.
 - Never push directly to the base branch. Never force-push a branch someone else is using. Never merge your own PR or deploy.
 - **After opening every PR, the developer must trigger the review before reporting progress.** If `droid` is available, run:
   ```bash
@@ -132,7 +132,7 @@ Written rules can be forgotten or talked around, so Tera also limits what agents
 - Anything outside this repo: global git config, shell profiles, `~/.codex`, `~/.factory`, global installs, `curl … | sh`.
 - `git push` is fine only for your own feature branch.
 
-**Protected files** — change only when the issue names them: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/` (CI workflows, PR template), `.agents/`, plus the files listed under *This repo*. Never weaken a check so that your change passes.
+**Protected files** — when present in a repository, change `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/` (CI workflows, PR template), and `.agents/` only when named in the Linear issue or the narrow governance-only request in §1. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
 
 ## 8. Keep tests honest
 
