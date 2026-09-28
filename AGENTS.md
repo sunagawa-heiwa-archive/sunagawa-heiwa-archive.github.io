@@ -96,7 +96,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 
 ## 5. Commits, PRs, and mandatory review gate
 
-- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
+- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. During this initial v1.3 rollout, commits made before this rule is merged are grandfathered; use the stated format for all later commits. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
 - PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it. For the narrow governance-only exception in §1, use `[TASK] short summary` and start the body with `TASK — short summary`; do not invent an issue key.
 - Never push directly to the base branch. Never force-push a branch someone else is using. Never merge your own PR or deploy.
 - **After opening every PR, the developer must trigger the review before reporting progress.** If `droid` is available, run:
@@ -132,7 +132,7 @@ Written rules can be forgotten or talked around, so Tera also limits what agents
 - Anything outside this repo: global git config, shell profiles, `~/.codex`, `~/.factory`, global installs, `curl … | sh`.
 - `git push` is fine only for your own feature branch.
 
-**Protected files** — when present in a repository, change `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/`, and CI workflows only when named in a Linear issue. A PR template may also be changed by the narrow governance-only request in §1. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
+**Protected files** — changes require a Linear issue naming the files unless the narrow governance-only exception in §1 applies. That exception is limited to the exact governance documents listed there; it never permits changes to CI workflows or repo-specific protected data. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
 
 ## 8. Keep tests honest
 
