@@ -1,5 +1,4 @@
-<!-- Normally replace `ISSUE-ID` with the actual Linear issue key. Do not start work without an issue whose Description contains acceptance criteria. For Tera-requested governance-document-only maintenance allowed by AGENTS.md §1, use `TASK — short summary` instead and do not invent an issue key. -->
-Fixes ISSUE-ID
+<!-- For a Linear issue, start with `Fixes <actual issue key>`. Do not start work without an issue whose Description contains acceptance criteria. For Tera-requested governance-document-only maintenance allowed by AGENTS.md §1, start with `TASK — short summary`. Do not invent an issue key. -->
 
 ## What changed (plain language, 2–3 sentences)
 
@@ -10,7 +9,7 @@ Fixes ISSUE-ID
 - [ ] Repo checks (see AGENTS.md → *This repo*) — paste the result summary:
 - [ ] Test added or updated, or exact manual checks described below
 - [ ] Checked at 375px (phone) and desktop, if UI changed
-- [ ] `git diff --stat` contains only files this issue needs
+- [ ] `git diff --stat` contains only files this issue or governance task needs
 
 **Not verified:** <!-- be honest: what you could not run or check -->
 

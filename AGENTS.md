@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Rules for every coding agent in this repo: **Codex** (implementer), **Droid + Gemini** (reviewer), **Claude Code** (reads this via `CLAUDE.md`), and any other tool or human developer.
+This is the source of repository rules for every tool and human. **Claude Code** reads it via `CLAUDE.md`, but its repository development is paused as stated in *Who does what*.
 Read the whole file before starting. The *This repo* section comes first because it holds the facts you need most: base branch, checks, and what must never be touched.
 
 ## This repo: sunagawa-heiwa-archive.github.io
@@ -63,11 +63,11 @@ An agent that implemented a change must not review it. Tera owns the final merge
 1. **Every change starts from a Linear issue.** Its Description must include the user story, acceptance criteria, out-of-scope items, references, and UAT steps. An assignee or issue title is not acceptance criteria. If the issue is missing or its Description is empty/incomplete, stop and ask Tera to complete it; do not start from a chat prompt alone. Narrow exception: Tera may directly request governance-document-only maintenance (AGENTS.md, CLAUDE.md, reviewer instructions, or PR templates). Record that explicit request as `TASK — ...` in the PR; do not use this exception for application code, site content, or archive data.
 2. **Restate the task** in at most 5 bullets: what will change, what will not, and which files you expect to touch. Wait for Tera's OK before coding. The fast lane may skip that wait only for one-file, roughly 20-line, no-logic changes; the Linear issue (or narrow governance exception above), checks, PR, and review gate still apply.
 3. **Do not infer the implementer from the assignee.** The assignee is the human accountable for the issue. The `impl:codex`, `impl:orca`, or `impl:human` label identifies who will implement it. Tera sets the label and moves the issue to In Progress when work starts.
-4. **Use one issue, one branch, one PR.** Start from the latest base branch (see *This repo*): `git fetch origin && git switch -c <type>/<ISSUE-ID>-<short-slug> origin/<base>`. For Orca parallel work, use one worktree named for the issue; never run two agents on the same issue at once.
+4. **Use one issue or one explicit governance TASK, one branch, one PR.** Start from the latest base branch (see *This repo*): for an issue use `git fetch origin && git switch -c <type>/<ISSUE-ID>-<short-slug> origin/<base>`; for the §1 governance exception use `git switch -c codex/<short-slug> origin/<base>`. For Orca parallel work, use one worktree named for the issue; never run two agents on the same issue at once.
 
 ## 2. Scope rules — most bugs come from breaking these
 
-- **One issue per PR.** No drive-by refactors, renames, reformatting, or "while I'm here" fixes. List them under *Follow-ups* in the PR instead.
+- **One issue or one explicit governance TASK per PR.** No drive-by refactors, renames, reformatting, or "while I'm here" fixes. List them under *Follow-ups* in the PR instead.
 - **Small diffs.** Aim for under ~300 changed lines and ~10 files. If it will be bigger, say so and propose a split first.
 - **No new dependencies**, frameworks, build tools, CDNs, fonts, trackers, or external scripts without explicit approval in the issue.
 - **Do not rewrite content** (articles, copy, data, numbers) unless the issue asks for it.
@@ -88,7 +88,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 - [ ] The repo checks in *This repo* pass; the PR states exactly what ran and what did not.
 - [ ] New behavior has a test, or the PR gives exact manual checks.
 - [ ] UI changes were checked at 375px and desktop widths.
-- [ ] `git diff --stat origin/<base>` contains only files in the issue's scope.
+- [ ] `git diff --stat origin/<base>` contains only files in the issue's scope or the governance TASK's named documents.
 - [ ] The PR template is complete, including Tests changed, Safety check, What could break, UAT, and Review.
 - [ ] The `pr-reviewer` Droid + Gemini verdict is posted in the PR comments. Resolve P0/P1 findings; the verdict must be `Ready for UAT` before Tera starts UAT.
 - [ ] CI is green. Tera checks the green status herself before merging.
@@ -96,7 +96,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 
 ## 5. Commits, PRs, and mandatory review gate
 
-- Commit format: `type(scope): summary [ISSUE-ID]`. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
+- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
 - PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it. For the narrow governance-only exception in §1, use `[TASK] short summary` and start the body with `TASK — short summary`; do not invent an issue key.
 - Never push directly to the base branch. Never force-push a branch someone else is using. Never merge your own PR or deploy.
 - **After opening every PR, the developer must trigger the review before reporting progress.** If `droid` is available, run:
