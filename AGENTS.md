@@ -92,7 +92,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 - [ ] The PR template is complete, including Tests changed, Safety check, What could break, UAT, and Review.
 - [ ] The `pr-reviewer` Droid + Gemini verdict is posted in the PR comments. Resolve P0/P1 findings; the verdict must be `Ready for UAT` before Tera starts UAT.
 - [ ] CI is green. Tera checks the green status herself before merging.
-- [ ] Tera completes the PR's UAT on phone and desktop, then merges and deploys. Move the Linear issue through In Review before UAT and to Done only after merge/deploy.
+- [ ] Tera completes the PR's UAT on phone and desktop, then merges and deploys. For Linear-linked work, move the issue to In Review before UAT and to Done only after merge/deploy; governance TASKs have no Linear status transition.
 
 ## 5. Commits, PRs, and mandatory review gate
 
@@ -132,7 +132,7 @@ Written rules can be forgotten or talked around, so Tera also limits what agents
 - Anything outside this repo: global git config, shell profiles, `~/.codex`, `~/.factory`, global installs, `curl … | sh`.
 - `git push` is fine only for your own feature branch.
 
-**Protected files** — when present in a repository, change `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/` (CI workflows, PR template), and `.agents/` only when named in the Linear issue or the narrow governance-only request in §1. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
+**Protected files** — when present in a repository, change `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/`, and CI workflows only when named in a Linear issue. A PR template may also be changed by the narrow governance-only request in §1. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
 
 ## 8. Keep tests honest
 

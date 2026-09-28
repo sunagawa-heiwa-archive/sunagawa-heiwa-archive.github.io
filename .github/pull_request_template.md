@@ -1,4 +1,6 @@
-<!-- For a Linear issue, start with `Fixes <actual issue key>`. Do not start work without an issue whose Description contains acceptance criteria. For Tera-requested governance-document-only maintenance allowed by AGENTS.md §1, start with `TASK — short summary`. Do not invent an issue key. -->
+Fixes ISSUE-ID
+
+<!-- For a Linear issue, replace ISSUE-ID with its actual key. For Tera-requested governance-document-only maintenance allowed by AGENTS.md §1, replace this whole line with `TASK — short summary`. Do not invent an issue key. -->
 
 ## What changed (plain language, 2–3 sentences)
 
