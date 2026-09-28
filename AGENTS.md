@@ -30,7 +30,7 @@ python3 -m http.server 8000           # then open the pages you changed, at 375p
 
 - Treat duplicate filenames, 404 pages, and cloud-sync artifacts as investigation items; do not delete or rename them without an issue naming the exact paths.
 - Preserve archived article text, `raw/`, attribution, dates, and images byte-for-byte. A task that only says “clean up” is not authorization to alter or remove archive content.
-- Protected files here: `raw/`, archived article bodies under `articles/`, `scripts/check_links.py`, `AGENTS.md`, `CLAUDE.md`, `.github/`.
+- Protected files here: `raw/`, archived article bodies under `articles/`, `scripts/check_links.py`, `AGENTS.md`, `CLAUDE.md`, `.github/workflows/`. The PR template remains protected by §7 and the narrow exception in §1.
 
 ### Bulk edits across `articles/`
 
@@ -49,7 +49,7 @@ Bulk changes are done by a script in `scripts/`, never by hand-editing 208 files
 | Role | Who | Does | Does not |
 |---|---|---|---|
 | Product owner | Tera | Writes Linear issues and acceptance criteria, sets priority, does UAT, merges PRs, deploys | Skip UAT or merge before checks |
-| Developer (human) | Human engineering lead | Takes complex or engineering-heavy issues, starting with Polymarket Observatory; explains the approach in the PR | Push directly to a base branch |
+| Developer (human) | Human engineering lead | Takes complex or engineering-heavy issues as assigned by Tera; explains the approach in the PR | Push directly to a base branch |
 | Developer (AI) | Codex; Orca only when explicitly assigned | Implements scoped issues and opens one PR per issue | Merge or deploy |
 | Reviewer | Droid + Gemini (`pr-reviewer`) | Reviews the PR and posts P0/P1/P2 findings | Edit code, approve, or merge |
 | Product and design | Claude (Cowork) | Writes specs, splits issues, prepares designs, audits, and runs weekly retrospectives | Develop in a repository |
@@ -63,7 +63,7 @@ An agent that implemented a change must not review it. Tera owns the final merge
 1. **Every change starts from a Linear issue.** Its Description must include the user story, acceptance criteria, out-of-scope items, references, and UAT steps. An assignee or issue title is not acceptance criteria. If the issue is missing or its Description is empty/incomplete, stop and ask Tera to complete it; do not start from a chat prompt alone. Narrow exception: Tera may directly request governance-document-only maintenance (AGENTS.md, CLAUDE.md, the global Droid reviewer file `~/.factory/droids/pr-reviewer.md` only when Tera explicitly names it, or this repo’s `.github/pull_request_template.md`). Record that explicit request as `TASK — ...` in the PR; do not use this exception for application code, site content, or archive data.
 2. **Restate the task** in at most 5 bullets: what will change, what will not, and which files you expect to touch. Wait for Tera's OK before coding. The fast lane may skip that wait only for one-file, roughly 20-line, no-logic changes; the Linear issue (or narrow governance exception above), checks, PR, and review gate still apply.
 3. **Do not infer the implementer from the assignee.** The assignee is the human accountable for the issue. The `impl:codex`, `impl:orca`, or `impl:human` label identifies who will implement it. Tera sets the label and moves the issue to In Progress when work starts.
-4. **Use one issue or one explicit governance TASK, one branch, one PR.** Start from the latest base branch (see *This repo*): for an issue use `git fetch origin && git switch -c <type>/<ISSUE-ID>-<short-slug> origin/<base>`; for the §1 governance exception use `git switch -c codex/<short-slug> origin/<base>`. For Orca parallel work, use one worktree named for the issue; never run two agents on the same issue at once.
+4. **Use one issue or one explicit governance TASK, one branch, one PR.** Start from the latest base branch (see *This repo*): for an issue use `git fetch origin && git switch -c <type>/<ISSUE-ID>-<short-slug> origin/<base>`; for the §1 governance exception use `git switch -c <implementer-prefix>/<short-slug> origin/<base>` (the assigned implementer’s prefix; default `codex/`). For Orca parallel work, use one worktree named for the issue; never run two agents on the same issue at once.
 
 ## 2. Scope rules — most bugs come from breaking these
 
@@ -96,12 +96,12 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 
 ## 5. Commits, PRs, and mandatory review gate
 
-- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. The initial v1.3 adoption PRs may contain earlier commits from before these formats were added; do not rewrite those PRs’ history. This one-time exception ends with this rollout; all new commits use the formats above. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
+- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`, e.g. `docs(workflow): clarify review gate [TASK]`. The initial adoption PRs are fintech101 #21, Polymarket Observatory #53, blog #38, and Sunagawa archive #30. Commits on those branches from before this format was introduced are grandfathered; do not rewrite their history. All new commits use the formats above. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
 - PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it. For the narrow governance-only exception in §1, use `[TASK] short summary` and start the body with `TASK — short summary`; do not invent an issue key.
 - Never push directly to the base branch. Never force-push a branch someone else is using. Never merge your own PR or deploy.
-- **After opening every PR, the developer must trigger the review before reporting progress.** First confirm the PR exists and its branch is visible on the push remote (`git ls-remote --heads <push-remote> <branch>`); if missing, push the feature branch and recheck. The installed Droid CLI requires `--auto high` to post this comment; only use it with the restricted `pr-reviewer` instructions below, and never use `--skip-permissions-unsafe`. If that reviewer configuration is unavailable, stop and ask Tera before UAT. If `droid` is available, run:
+- **After opening every PR, the developer must trigger the review before reporting progress.** First confirm the PR exists and its branch is visible on the push remote (`git ls-remote --heads <push-remote> <branch>`); if missing, push the feature branch and recheck. Try `--auto low` first. If Droid rejects it, retry only at the minimum level it names. The global `pr-reviewer` instructions restrict writes to the review comment; never use `--skip-permissions-unsafe`. If the minimum is `high`, ask Tera to authorize that review specifically before retrying; if she does not authorize it, stop before UAT. If `droid` is available, run:
   ```bash
-  droid exec --cwd . --auto high "Use only the pr-reviewer droid instructions. Read the PR diff and run documented checks. The only permitted write is posting the verdict with gh pr review <n> --comment (never --approve). Do not edit, commit, push, merge, or deploy. Never use --skip-permissions-unsafe."
+  droid exec --cwd . --auto low "Use only the pr-reviewer droid instructions. Read the PR diff and run documented checks. The only permitted write is posting the verdict with gh pr review <n> --comment (never --approve). Do not edit, commit, push, merge, or deploy."
   ```
 - If `droid` is unavailable, state that explicitly in the PR and stop before UAT. Tera runs the review command herself. Do not mark the task In Review or say the PR is ready for UAT until a `pr-reviewer` verdict comment exists.
 - P0/P1 findings go back to the implementer. The reviewer does not edit code or approve. Only Tera merges after UAT and checks.
