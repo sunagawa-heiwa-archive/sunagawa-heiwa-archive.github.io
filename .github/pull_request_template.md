@@ -33,7 +33,7 @@ Fixes ISSUE-ID
 ## Review
 
 - [ ] `pr-reviewer` ran with Gemini and posted its full verdict in this PR's comments
-- Verdict: `Ready for UAT` / `Needs changes` / `Too big`
+- Verdict: `Ready for UAT` / `Needs changes` / `Too big — split it`
 - [ ] No unresolved P0/P1 findings
 - If review could not run, explain why; stop before UAT until Tera runs it.
 

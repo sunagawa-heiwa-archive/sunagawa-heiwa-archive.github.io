@@ -60,7 +60,7 @@ An agent that implemented a change must not review it. Tera owns the final merge
 
 ## 1. Before writing code
 
-1. **Every change starts from a Linear issue.** Its Description must include the user story, acceptance criteria, out-of-scope items, references, and UAT steps. An assignee or issue title is not acceptance criteria. If the issue is missing or its Description is empty/incomplete, stop and ask Tera to complete it; do not start from a chat prompt alone. Narrow exception: Tera may directly request governance-document-only maintenance (AGENTS.md, CLAUDE.md, reviewer instructions, or PR templates). Record that explicit request as `TASK — ...` in the PR; do not use this exception for application code, site content, or archive data.
+1. **Every change starts from a Linear issue.** Its Description must include the user story, acceptance criteria, out-of-scope items, references, and UAT steps. An assignee or issue title is not acceptance criteria. If the issue is missing or its Description is empty/incomplete, stop and ask Tera to complete it; do not start from a chat prompt alone. Narrow exception: Tera may directly request governance-document-only maintenance (AGENTS.md, CLAUDE.md, the global Droid reviewer file `~/.factory/droids/pr-reviewer.md` only when Tera explicitly names it, or this repo’s `.github/pull_request_template.md`). Record that explicit request as `TASK — ...` in the PR; do not use this exception for application code, site content, or archive data.
 2. **Restate the task** in at most 5 bullets: what will change, what will not, and which files you expect to touch. Wait for Tera's OK before coding. The fast lane may skip that wait only for one-file, roughly 20-line, no-logic changes; the Linear issue (or narrow governance exception above), checks, PR, and review gate still apply.
 3. **Do not infer the implementer from the assignee.** The assignee is the human accountable for the issue. The `impl:codex`, `impl:orca`, or `impl:human` label identifies who will implement it. Tera sets the label and moves the issue to In Progress when work starts.
 4. **Use one issue or one explicit governance TASK, one branch, one PR.** Start from the latest base branch (see *This repo*): for an issue use `git fetch origin && git switch -c <type>/<ISSUE-ID>-<short-slug> origin/<base>`; for the §1 governance exception use `git switch -c codex/<short-slug> origin/<base>`. For Orca parallel work, use one worktree named for the issue; never run two agents on the same issue at once.
@@ -85,7 +85,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 
 ## 4. Definition of done
 
-- [ ] The repo checks in *This repo* pass; the PR states exactly what ran and what did not.
+- [ ] Run every applicable check in *This repo* and record exactly what ran and what did not. Green CI does not imply an unrun local or manual check passed.
 - [ ] New behavior has a test, or the PR gives exact manual checks.
 - [ ] UI changes were checked at 375px and desktop widths.
 - [ ] `git diff --stat origin/<base>` contains only files in the issue's scope or the governance TASK's named documents.
@@ -96,12 +96,12 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 
 ## 5. Commits, PRs, and mandatory review gate
 
-- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. During this initial v1.3 rollout, commits made before this rule is merged are grandfathered; use the stated format for all later commits. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
+- Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. The initial v1.3 adoption PRs may contain earlier commits from before these formats were added; do not rewrite those PRs’ history. This one-time exception ends with this rollout; all new commits use the formats above. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
 - PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it. For the narrow governance-only exception in §1, use `[TASK] short summary` and start the body with `TASK — short summary`; do not invent an issue key.
 - Never push directly to the base branch. Never force-push a branch someone else is using. Never merge your own PR or deploy.
-- **After opening every PR, the developer must trigger the review before reporting progress.** If `droid` is available, run:
+- **After opening every PR, the developer must trigger the review before reporting progress.** First confirm the PR exists and its branch is visible on the push remote (`git ls-remote --heads <push-remote> <branch>`); if missing, push the feature branch and recheck. If `droid` is available, run:
   ```bash
-  droid exec --cwd . --auto low "Use the pr-reviewer droid to review branch <branch> (PR #<n>). Post the result as a PR comment with gh pr review <n> --comment (never --approve)."
+  droid exec --cwd . --auto high "Use only the pr-reviewer droid instructions. Read the PR diff and run documented checks. The only permitted write is posting the verdict with gh pr review <n> --comment (never --approve). Do not edit, commit, push, merge, or deploy."
   ```
 - If `droid` is unavailable, state that explicitly in the PR and stop before UAT. Tera runs the review command herself. Do not mark the task In Review or say the PR is ready for UAT until a `pr-reviewer` verdict comment exists.
 - P0/P1 findings go back to the implementer. The reviewer does not edit code or approve. Only Tera merges after UAT and checks.
@@ -132,7 +132,7 @@ Written rules can be forgotten or talked around, so Tera also limits what agents
 - Anything outside this repo: global git config, shell profiles, `~/.codex`, `~/.factory`, global installs, `curl … | sh`.
 - `git push` is fine only for your own feature branch.
 
-**Protected files** — changes require a Linear issue naming the files unless the narrow governance-only exception in §1 applies. That exception is limited to the exact governance documents listed there; it never permits changes to CI workflows or repo-specific protected data. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
+**Protected files** — changes require a Linear issue naming the files unless the narrow governance-only exception in §1 applies. That exception is limited to the exact paths listed there; it never permits changes to CI workflows or repo-specific protected data. Also protect the files listed under *This repo*. Never weaken a check so that your change passes.
 
 ## 8. Keep tests honest
 
