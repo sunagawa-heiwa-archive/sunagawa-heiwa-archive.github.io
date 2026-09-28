@@ -10,7 +10,7 @@ Fixes ISSUE-ID
 
 - [ ] Repo checks (see AGENTS.md → *This repo*) — paste the result summary:
 - [ ] Test added or updated, or exact manual checks described below
-- [ ] Checked at 375px (phone) and desktop, if UI changed
+- [ ] If UI changed, checked at 375px (phone) and desktop; otherwise mark N/A for a docs/non-UI change
 - [ ] `git diff --stat` contains only files this issue or governance task needs
 
 **Not verified:** <!-- be honest: what you could not run or check -->
@@ -39,8 +39,8 @@ Fixes ISSUE-ID
 
 ## UAT steps for Tera
 
-1. Phone:
-2. Desktop:
+1. Describe the focused checks Tera should perform.
+2. For UI changes, include phone (375px) and desktop checks; for docs-only/non-UI changes, state why those checks are N/A.
 
 Expected result:
 

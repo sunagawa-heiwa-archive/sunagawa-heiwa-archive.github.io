@@ -49,7 +49,7 @@ Bulk changes are done by a script in `scripts/`, never by hand-editing 208 files
 | Role | Who | Does | Does not |
 |---|---|---|---|
 | Product owner | Tera | Writes Linear issues and acceptance criteria, sets priority, does UAT, merges PRs, deploys | Skip UAT or merge before checks |
-| Developer (human) | Tera's spouse | Takes complex or engineering-heavy issues (radar first); explains the approach in the PR | Push directly to a base branch |
+| Developer (human) | Human engineering lead | Takes complex or engineering-heavy issues (radar first); explains the approach in the PR | Push directly to a base branch |
 | Developer (AI) | Codex; Orca only when explicitly assigned | Implements scoped issues and opens one PR per issue | Merge or deploy |
 | Reviewer | Droid + Gemini (`pr-reviewer`) | Reviews the PR and posts P0/P1/P2 findings | Edit code, approve, or merge |
 | Product and design | Claude (Cowork) | Writes specs, splits issues, prepares designs, audits, and runs weekly retrospectives | Develop in a repository |
@@ -92,7 +92,7 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 - [ ] The PR template is complete, including Tests changed, Safety check, What could break, UAT, and Review.
 - [ ] The `pr-reviewer` Droid + Gemini verdict is posted in the PR comments. Resolve P0/P1 findings; the verdict must be `Ready for UAT` before Tera starts UAT.
 - [ ] CI is green. Tera checks the green status herself before merging.
-- [ ] Tera completes the PR's UAT on phone and desktop, then merges and deploys. For Linear-linked work, move the issue to In Review before UAT and to Done only after merge/deploy; governance TASKs have no Linear status transition.
+- [ ] Tera completes appropriate UAT (phone and desktop for UI changes), then merges and deploys. For Linear-linked work, move the issue to In Review before UAT and to Done only after merge/deploy; governance TASKs have no Linear status transition.
 
 ## 5. Commits, PRs, and mandatory review gate
 
