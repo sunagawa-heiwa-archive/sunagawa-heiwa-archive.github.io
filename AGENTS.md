@@ -49,7 +49,7 @@ Bulk changes are done by a script in `scripts/`, never by hand-editing 208 files
 | Role | Who | Does | Does not |
 |---|---|---|---|
 | Product owner | Tera | Writes Linear issues and acceptance criteria, sets priority, does UAT, merges PRs, deploys | Skip UAT or merge before checks |
-| Developer (human) | Human engineering lead | Takes complex or engineering-heavy issues (radar first); explains the approach in the PR | Push directly to a base branch |
+| Developer (human) | Human engineering lead | Takes complex or engineering-heavy issues, starting with Polymarket Observatory; explains the approach in the PR | Push directly to a base branch |
 | Developer (AI) | Codex; Orca only when explicitly assigned | Implements scoped issues and opens one PR per issue | Merge or deploy |
 | Reviewer | Droid + Gemini (`pr-reviewer`) | Reviews the PR and posts P0/P1/P2 findings | Edit code, approve, or merge |
 | Product and design | Claude (Cowork) | Writes specs, splits issues, prepares designs, audits, and runs weekly retrospectives | Develop in a repository |
@@ -99,9 +99,9 @@ If the bug cannot be tested automatically, say why in the PR and give exact manu
 - Commit format: `type(scope): summary [ISSUE-ID]`. For the §1 governance exception, use `docs(scope): summary [TASK]`. The initial v1.3 adoption PRs may contain earlier commits from before these formats were added; do not rewrite those PRs’ history. This one-time exception ends with this rollout; all new commits use the formats above. Types: `feat` `fix` `content` `style` `refactor` `test` `chore` `docs`.
 - PR title: `[ISSUE-ID] short summary`. Start the PR body with `Fixes ISSUE-ID` so Linear can link it. For the narrow governance-only exception in §1, use `[TASK] short summary` and start the body with `TASK — short summary`; do not invent an issue key.
 - Never push directly to the base branch. Never force-push a branch someone else is using. Never merge your own PR or deploy.
-- **After opening every PR, the developer must trigger the review before reporting progress.** First confirm the PR exists and its branch is visible on the push remote (`git ls-remote --heads <push-remote> <branch>`); if missing, push the feature branch and recheck. If `droid` is available, run:
+- **After opening every PR, the developer must trigger the review before reporting progress.** First confirm the PR exists and its branch is visible on the push remote (`git ls-remote --heads <push-remote> <branch>`); if missing, push the feature branch and recheck. The installed Droid CLI requires `--auto high` to post this comment; only use it with the restricted `pr-reviewer` instructions below, and never use `--skip-permissions-unsafe`. If that reviewer configuration is unavailable, stop and ask Tera before UAT. If `droid` is available, run:
   ```bash
-  droid exec --cwd . --auto high "Use only the pr-reviewer droid instructions. Read the PR diff and run documented checks. The only permitted write is posting the verdict with gh pr review <n> --comment (never --approve). Do not edit, commit, push, merge, or deploy."
+  droid exec --cwd . --auto high "Use only the pr-reviewer droid instructions. Read the PR diff and run documented checks. The only permitted write is posting the verdict with gh pr review <n> --comment (never --approve). Do not edit, commit, push, merge, or deploy. Never use --skip-permissions-unsafe."
   ```
 - If `droid` is unavailable, state that explicitly in the PR and stop before UAT. Tera runs the review command herself. Do not mark the task In Review or say the PR is ready for UAT until a `pr-reviewer` verdict comment exists.
 - P0/P1 findings go back to the implementer. The reviewer does not edit code or approve. Only Tera merges after UAT and checks.
