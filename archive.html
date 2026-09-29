@@ -21,7 +21,7 @@
 <div class="stats" aria-label="Archive size"><span>208 articles / 208件の記事</span><span>FC2: 90</span><span>Ameblo: 118</span></div>
 <p class="year-gap note">収録メモ：2019年・2021年の記事はありません（FC2は2011–2018年中心、Amebloは2022年3月開設、2020年は1件）。年・言語・種類で絞り込めます。全文検索は入力時に読み込みます。</p>
 <div class="search"><label for="article-search">Search articles / 記事検索</label><input id="article-search" type="search" autocomplete="off" placeholder="Search titles and article text / タイトル・本文を検索" aria-describedby="filter-status-text"></div>
-<div class="filter-status"><span id="filter-status-text" aria-live="polite">Showing all 208 articles / 全208件を表示</span><button id="reset-filters" type="button">Reset all filters / すべて解除</button></div>
+<div class="filter-status"><span id="filter-status-text" aria-live="polite">Showing all 208 articles / 全208件を表示</span><div class="filter-actions"><div class="sort-control" id="sort-control" hidden><label for="sort-select">並び順 / Sort:</label><select id="sort-select"><option value="relevance">関連度順 / Most relevant</option><option value="date">新しい順 / Newest first</option></select></div><button id="reset-filters" type="button">Reset all filters / すべて解除</button></div></div>
 <div class="language-nav" aria-label="Article language / 記事の言語"><div class="language-nav-label">Article language / 記事の言語</div><button class="language-filter active" type="button" aria-pressed="true" data-language-filter="all">All languages / 全言語 <small>208</small></button><button class="language-filter" type="button" aria-pressed="false" data-language-filter="ja">Japanese / 日本語 <small>190</small></button><button class="language-filter" type="button" aria-pressed="false" data-language-filter="en">English / 英語 <small>10</small></button><button class="language-filter" type="button" aria-pressed="false" data-language-filter="ja-en">Japanese + English / 日本語 + 英語 <small>5</small></button><button class="language-filter" type="button" aria-pressed="false" data-language-filter="zh">Chinese / 中文（繁體・简体） <small>3</small></button></div>
 <div class="type-nav" aria-label="Type / 種類"><div class="type-nav-label">Type / 種類</div><button class="type-filter active" type="button" aria-pressed="true" data-type-filter="all">All types / 全種類 <small>208</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="guide">解説 / Guide <small>24</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="lawsuit">訴訟 / Lawsuit <small>9</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="gathering">集会 / Gathering <small>60</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="links">リンク集 / Links <small>15</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="newsletter">通信 / Newsletter <small>2</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="notice">お知らせ / Notice <small>29</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="community">地域 / Community <small>5</small></button><button class="type-filter" type="button" aria-pressed="false" data-type-filter="record">記録 / Record <small>64</small></button></div>
 <nav class="year-nav" aria-label="Filter by year / 年別フィルター"><details class="year-nav-details"><summary class="year-nav-summary"><span id="year-nav-current">All years / すべての年 · 208</span></summary><div class="year-nav-buttons"><div class="year-nav-label">Filter by year / 年別フィルター</div><button class="year-link active" type="button" aria-pressed="true" data-year-filter="all"><span>All / すべて</span><small>208</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2025"><span>2025</span><small>4</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2024"><span>2024</span><small>21</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2023"><span>2023</span><small>35</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2022"><span>2022</span><small>58</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2020"><span>2020</span><small>1</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2018"><span>2018</span><small>8</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2017"><span>2017</span><small>16</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2016"><span>2016</span><small>12</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2015"><span>2015</span><small>21</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2014"><span>2014</span><small>3</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2013"><span>2013</span><small>8</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2012"><span>2012</span><small>19</small></button><button class="year-link" type="button" aria-pressed="false" data-year-filter="2011"><span>2011</span><small>2</small></button></div></details></nav>
@@ -30,6 +30,7 @@
 <p class="no-results-help">Try using different search keywords or reset active filters.<br>別のキーワードで検索するか、フィルターを解除してください。</p>
 <button id="no-results-reset" class="no-results-reset" type="button">Reset all filters / すべて解除</button>
 </div>
+<div id="search-results-list" class="entry-list search-results-list" hidden></div>
 <section class="year-section" id="year-2025"><h2>2025 <small class="year-count">4 articles / 4件</small></h2><section class="month-section"><h3>September / 9月 <small class="month-count">1 article / 1件</small></h3><div class="entry-list"><a class="entry" data-language="ja" data-year="2025" data-type="gathering" href="articles/ameblo-12931093226.html"><span class="entry-title">2025年秋の集会「基地に抗う」10月18日(土) 13:40～  立川市アイムホールにて開催</span><span class="entry-meta"><time datetime="2025-09-18T16:55:52+09:00">2025年9月18日</time> · Ameblo · <span class="entry-language">Japanese / 日本語</span> · <span class="entry-type">集会 / Gathering</span></span></a>
 </div></section>
 <section class="month-section"><h3>June / 6月 <small class="month-count">1 article / 1件</small></h3><div class="entry-list"><a class="entry" data-language="ja" data-year="2025" data-type="gathering" href="articles/ameblo-12907468172.html"><span class="entry-title">2025.6.7(土) 砂川闘争70周年のつどい</span><span class="entry-meta"><time datetime="2025-06-01T10:44:17+09:00">2025年6月1日</time> · Ameblo · <span class="entry-language">Japanese / 日本語</span> · <span class="entry-type">集会 / Gathering</span></span></a>
@@ -337,11 +338,18 @@
     const yearCurrent = document.querySelector('#year-nav-current');
     const yearNavIsCompact = () => window.matchMedia('(max-width:700px)').matches;
     const entries = [...document.querySelectorAll('.entry[data-language]')];
+    const entryLists = [...document.querySelectorAll('.month-section .entry-list')];
+    entryLists.forEach((list) => {
+      list._origEntries = [...list.querySelectorAll('.entry')];
+    });
     const months = [...document.querySelectorAll('.month-section')];
     const years = [...document.querySelectorAll('.year-section')];
     const status = document.querySelector('#filter-status-text');
     const resetButton = document.querySelector('#reset-filters');
     const searchInput = document.querySelector('#article-search');
+    const sortControl = document.querySelector('#sort-control');
+    const sortSelect = document.querySelector('#sort-select');
+    const searchResultsList = document.querySelector('#search-results-list');
     const noResults = document.querySelector('#no-results');
     const noResultsReset = document.querySelector('#no-results-reset');
     const labels = { all: 'all', ja: ['Japanese', '日本語'], en: ['English', '英語'], 'ja-en': ['Japanese + English', '日本語 + 英語'], zh: ['Chinese', '中文（繁體・简体）'] };
@@ -378,11 +386,22 @@
         });
       return window.__searchIndexPromise;
     };
-    const applyFilters = (language, requestedYear, requestedType, requestedQuery = '', syncUrl = true, remember = syncUrl) => {
+    const countOccurrences = (str, sub) => {
+      if (!sub || !str) return 0;
+      let count = 0;
+      let pos = 0;
+      while ((pos = str.indexOf(sub, pos)) !== -1) {
+        count++;
+        pos += sub.length;
+      }
+      return count;
+    };
+    const applyFilters = (language, requestedYear, requestedType, requestedQuery = '', requestedSort = 'relevance', syncUrl = true, remember = syncUrl) => {
       const hasLanguage = (entry) => language === 'all' || entry.dataset.language === language;
       const hasType = (entry) => requestedType === 'all' || entry.dataset.type === requestedType;
       const query = requestedQuery.trim().toLowerCase();
       const hasSearch = (entry) => !query || (entry.dataset.search || '').includes(query);
+      const sort = requestedSort === 'date' ? 'date' : 'relevance';
       let year = requestedYear;
       let type = requestedType;
       if (year !== 'all' && !entries.some((entry) => hasLanguage(entry) && hasType(entry) && hasSearch(entry) && entry.dataset.year === year)) year = 'all';
@@ -392,6 +411,12 @@
       yearButtons.forEach((button) => { const active = button.dataset.yearFilter === year; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
       const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const escapeHtml = (s) => s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t));
+
+      entryLists.forEach((list) => {
+        list._origEntries.forEach((entry) => {
+          if (entry.parentElement !== list) list.appendChild(entry);
+        });
+      });
 
       entries.forEach((entry) => {
         const isHidden = !hasLanguage(entry) || !hasType(entry) || !hasSearch(entry) || (year !== 'all' && entry.dataset.year !== year);
@@ -442,20 +467,48 @@
           if (existingSnippet) existingSnippet.remove();
         }
       });
-      months.forEach((month) => {
-        const count = month.querySelectorAll('.entry:not([hidden])').length;
-        month.hidden = count === 0;
-        const countLabel = month.querySelector('.month-count');
-        if (countLabel) countLabel.textContent = `${count} article${count === 1 ? '' : 's'} / ${count}件`;
-      });
-      years.forEach((yearSection) => {
-        const count = yearSection.querySelectorAll('.entry:not([hidden])').length;
-        yearSection.hidden = count === 0;
-        const countLabel = yearSection.querySelector('.year-count');
-        if (countLabel) countLabel.textContent = `${count} article${count === 1 ? '' : 's'} / ${count}件`;
-      });
+
       const visibleEntries = entries.filter((entry) => !entry.hidden);
+
+      const isRelevance = Boolean(query && sort === 'relevance');
+      if (isRelevance && searchResultsList) {
+        visibleEntries.forEach((entry) => {
+          const titleEl = entry.querySelector('.entry-title');
+          const title = (titleEl && titleEl.dataset.origText ? titleEl.dataset.origText : (titleEl ? titleEl.textContent : '')).toLowerCase();
+          const body = (entry.dataset.search || '').toLowerCase();
+          const timeEl = entry.querySelector('time');
+          const pubTime = timeEl && timeEl.getAttribute('datetime') ? new Date(timeEl.getAttribute('datetime')).getTime() : 0;
+          const titleMatches = countOccurrences(title, query);
+          const bodyMatches = countOccurrences(body, query);
+          entry._score = (titleMatches * 10000) + (bodyMatches * 10) + (pubTime / 1e11);
+        });
+        visibleEntries.sort((a, b) => b._score - a._score);
+        years.forEach((yearSection) => { yearSection.hidden = true; });
+        months.forEach((month) => { month.hidden = true; });
+        visibleEntries.forEach((entry) => searchResultsList.appendChild(entry));
+        searchResultsList.hidden = visibleEntries.length === 0;
+      } else {
+        if (searchResultsList) searchResultsList.hidden = true;
+        months.forEach((month) => {
+          const count = month.querySelectorAll('.entry:not([hidden])').length;
+          month.hidden = count === 0;
+          const countLabel = month.querySelector('.month-count');
+          if (countLabel) countLabel.textContent = `${count} article${count === 1 ? '' : 's'} / ${count}件`;
+        });
+        years.forEach((yearSection) => {
+          const count = yearSection.querySelectorAll('.entry:not([hidden])').length;
+          yearSection.hidden = count === 0;
+          const countLabel = yearSection.querySelector('.year-count');
+          if (countLabel) countLabel.textContent = `${count} article${count === 1 ? '' : 's'} / ${count}件`;
+        });
+      }
+
       if (noResults) noResults.hidden = visibleEntries.length > 0;
+      if (sortControl) {
+        sortControl.hidden = !query || visibleEntries.length === 0;
+        if (sortSelect) sortSelect.value = sort;
+      }
+
       yearButtons.forEach((button) => {
         const yearValue = button.dataset.yearFilter;
         const yearEntries = entries.filter((entry) => hasLanguage(entry) && hasType(entry) && hasSearch(entry) && (yearValue === 'all' || entry.dataset.year === yearValue));
@@ -504,8 +557,14 @@
         else url.searchParams.set('year', year);
         if (type === 'all') url.searchParams.delete('type');
         else url.searchParams.set('type', type);
-        if (query) url.searchParams.set('q', requestedQuery.trim());
-        else url.searchParams.delete('q');
+        if (query) {
+          url.searchParams.set('q', requestedQuery.trim());
+          if (sort === 'date') url.searchParams.set('sort', 'date');
+          else url.searchParams.set('sort', 'relevance');
+        } else {
+          url.searchParams.delete('q');
+          url.searchParams.delete('sort');
+        }
         window.history.replaceState({}, '', url);
         if (remember) {
           try { sessionStorage.setItem('archive_last_search', window.location.search); } catch(e){}
@@ -519,35 +578,32 @@
         language: p.get('language') || 'all',
         year: p.get('year') || 'all',
         type: p.get('type') || 'all',
-        q: p.get('q') || ''
+        q: p.get('q') || '',
+        sort: p.get('sort') || 'relevance'
       };
     };
-    const run = (language, year, type, query, syncUrl = true, remember = syncUrl) => {
-      const go = () => applyFilters(language, year, type, query, syncUrl, remember);
+    const run = (language, year, type, query, sort = 'relevance', syncUrl = true, remember = syncUrl) => {
+      const go = () => applyFilters(language, year, type, query, sort, syncUrl, remember);
       if (query.trim()) return loadSearchIndex().then(go);
       return Promise.resolve(go());
     };
-    languageButtons.forEach((button) => button.addEventListener('click', () => { const p = current(); run(button.dataset.languageFilter, p.year, p.type, p.q); }));
-    typeButtons.forEach((button) => button.addEventListener('click', () => { const p = current(); run(p.language, p.year, button.dataset.typeFilter, p.q); }));
+    languageButtons.forEach((button) => button.addEventListener('click', () => { const p = current(); run(button.dataset.languageFilter, p.year, p.type, p.q, p.sort); }));
+    typeButtons.forEach((button) => button.addEventListener('click', () => { const p = current(); run(p.language, p.year, button.dataset.typeFilter, p.q, p.sort); }));
     yearButtons.forEach((button) => button.addEventListener('click', () => {
       const p = current();
-      run(p.language, button.dataset.yearFilter, p.type, p.q);
+      run(p.language, button.dataset.yearFilter, p.type, p.q, p.sort);
       if (yearPanel && yearNavIsCompact()) yearPanel.open = false;
     }));
-    if (searchInput) searchInput.addEventListener('input', () => { const p = current(); run(p.language, p.year, p.type, searchInput.value); });
-    if (resetButton) resetButton.addEventListener('click', () => run('all', 'all', 'all', ''));
-    if (noResultsReset) noResultsReset.addEventListener('click', () => run('all', 'all', 'all', ''));
+    if (searchInput) searchInput.addEventListener('input', () => { const p = current(); run(p.language, p.year, p.type, searchInput.value, p.sort); });
+    if (sortSelect) sortSelect.addEventListener('change', () => { const p = current(); run(p.language, p.year, p.type, p.q, sortSelect.value); });
+    if (resetButton) resetButton.addEventListener('click', () => run('all', 'all', 'all', '', 'relevance'));
+    if (noResultsReset) noResultsReset.addEventListener('click', () => run('all', 'all', 'all', '', 'relevance'));
     const initial = current();
     const initialLanguage = languageButtons.some((button) => button.dataset.languageFilter === initial.language) ? initial.language : 'all';
     const initialYear = yearButtons.some((button) => button.dataset.yearFilter === initial.year) ? initial.year : 'all';
     const initialType = typeButtons.some((button) => button.dataset.typeFilter === initial.type) ? initial.type : 'all';
-    // The first render syncs the address bar so a shared link that asks for a
-    // combination which cannot exist (e.g. a year with no articles left after the
-    // other filters) is rewritten to match what is actually shown — otherwise the
-    // link and the visible results disagree. It does not store the state for the
-    // article pages' "back to the list" link; that stays tied to the visitor's own
-    // filter changes.
-    run(initialLanguage, initialYear, initialType, initial.q, true, false);
+    const initialSort = initial.sort === 'date' ? 'date' : 'relevance';
+    run(initialLanguage, initialYear, initialType, initial.q, initialSort, true, false);
     const syncYearPanel = () => { if (yearPanel) yearPanel.open = !yearNavIsCompact(); };
     syncYearPanel();
     window.matchMedia('(max-width:700px)').addEventListener('change', syncYearPanel);
