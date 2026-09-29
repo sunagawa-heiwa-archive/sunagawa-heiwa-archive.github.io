@@ -41,6 +41,18 @@
     }
   }
 
+  var THEME_CYCLE = {
+    'light': 'dark',
+    'dark': 'auto',
+    'auto': 'light'
+  };
+
+  var THEME_CONFIG = {
+    'light': { icon: '☀️', text: 'Theme: Light / 表示：ライト' },
+    'dark': { icon: '🌙', text: 'Theme: Dark / 表示：ダーク' },
+    'auto': { icon: '💻', text: 'Theme: Auto / 表示：自動' }
+  };
+
   function applyTheme(theme) {
     var root = document.documentElement;
     if (theme === 'light' || theme === 'dark') {
@@ -54,9 +66,24 @@
   }
 
   function updateSwitchUI(currentTheme) {
+    var toggleBtns = document.querySelectorAll('.theme-toggle-btn');
+    var cfg = THEME_CONFIG[currentTheme] || THEME_CONFIG.auto;
+    for (var i = 0; i < toggleBtns.length; i++) {
+      var toggleBtn = toggleBtns[i];
+      toggleBtn.setAttribute('data-theme-val', currentTheme);
+      toggleBtn.setAttribute('aria-label', cfg.text);
+      toggleBtn.title = cfg.text;
+      var iconEl = toggleBtn.querySelector('.theme-toggle-icon');
+      if (iconEl) {
+        iconEl.textContent = cfg.icon;
+      } else {
+        toggleBtn.innerHTML = '<span class="theme-toggle-icon" aria-hidden="true">' + cfg.icon + '</span>';
+      }
+    }
+
     var buttons = document.querySelectorAll('.theme-btn');
-    for (var i = 0; i < buttons.length; i++) {
-      var btn = buttons[i];
+    for (var j = 0; j < buttons.length; j++) {
+      var btn = buttons[j];
       var val = btn.getAttribute('data-theme-val');
       var isCurrent = val === currentTheme;
       if (isCurrent) {
@@ -69,28 +96,49 @@
     }
   }
 
-  function mountThemeSwitch() {
-    var nav = document.querySelector('.site-nav');
-    if (!nav) return;
+  function cycleTheme() {
+    var current = getStoredTheme();
+    var next = THEME_CYCLE[current] || 'light';
+    setStoredTheme(next);
+    applyTheme(next);
+  }
 
-    var existing = nav.querySelector('.theme-switch');
-    if (!existing) {
-      var switcher = document.createElement('div');
-      switcher.className = 'theme-switch';
-      switcher.setAttribute('role', 'group');
-      switcher.setAttribute('aria-label', 'Theme / テーマ切替');
-      switcher.innerHTML =
-        '<button type="button" class="theme-btn" data-theme-val="light" aria-pressed="false" title="Light / ライト"><span aria-hidden="true">☀️</span> <span>Light</span></button>' +
-        '<button type="button" class="theme-btn" data-theme-val="dark" aria-pressed="false" title="Dark / ダーク"><span aria-hidden="true">🌙</span> <span>Dark</span></button>' +
-        '<button type="button" class="theme-btn" data-theme-val="auto" aria-pressed="false" title="Auto / 自動"><span aria-hidden="true">💻</span> <span>Auto</span></button>';
-      nav.appendChild(switcher);
+  function mountThemeSwitch() {
+    var switchers = document.querySelectorAll('.theme-switch');
+    var currentTheme = getStoredTheme();
+    var cfg = THEME_CONFIG[currentTheme] || THEME_CONFIG.auto;
+
+    if (!switchers.length) {
+      var nav = document.querySelector('.site-nav');
+      if (nav) {
+        var sw = document.createElement('div');
+        sw.className = 'theme-switch';
+        nav.appendChild(sw);
+        switchers = [sw];
+      }
     }
 
-    applyTheme(getStoredTheme());
+    for (var i = 0; i < switchers.length; i++) {
+      var switcher = switchers[i];
+      switcher.setAttribute('role', 'region');
+      switcher.setAttribute('aria-label', 'Theme / テーマ切替');
+      switcher.innerHTML =
+        '<button type="button" class="theme-toggle-btn" data-theme-val="' + currentTheme + '" aria-label="' + cfg.text + '" title="' + cfg.text + '">' +
+          '<span class="theme-toggle-icon" aria-hidden="true">' + cfg.icon + '</span>' +
+        '</button>';
+    }
+
+    applyTheme(currentTheme);
   }
 
   // Handle button clicks via delegation
   document.addEventListener('click', function(e) {
+    var toggleBtn = e.target.closest ? e.target.closest('.theme-toggle-btn') : null;
+    if (toggleBtn) {
+      cycleTheme();
+      return;
+    }
+
     var btn = e.target.closest ? e.target.closest('.theme-btn') : null;
     if (!btn) return;
 
