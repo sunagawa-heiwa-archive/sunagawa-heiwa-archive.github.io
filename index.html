@@ -19,7 +19,7 @@
 <div class="lede">公開記事アーカイブ</div></header>
 <main id="main">
 <section class="hero-search-area" aria-labelledby="home-search-label">
-<form class="hero-search-form" action="archive.html" method="get" role="search" onsubmit="if(!this.q.value.trim()){this.q.name='';}">
+<form class="hero-search-form" action="archive.html" method="get" role="search" onsubmit="if(!this.q.value.trim()){location.href='archive.html';return false;}">
 <label id="home-search-label" for="home-search" class="hero-search-label">記事検索 / Search articles</label>
 <div class="hero-search-row">
 <input type="search" id="home-search" name="q" placeholder="例：砂川闘争、伊達判決、国賠訴訟…" autocomplete="off" enterkeyhint="search">

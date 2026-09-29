@@ -60,10 +60,14 @@ def test_home_search_form():
     
     # 4. Empty query handling (onsubmit attribute or form behavior)
     onsubmit = form.get("onsubmit", "")
-    assert "q" in onsubmit and "name" in onsubmit, (
-        "Form should handle empty query submission without sending empty q parameter"
+    assert "archive.html" in onsubmit and ("location" in onsubmit or "href" in onsubmit), (
+        f"Form should redirect to archive.html on empty submission, got onsubmit: {onsubmit}"
     )
-    print("  ✓ Empty query submission handling verified")
+    # Ensure name attribute is not mutated (protects against bfcache bugs)
+    assert ".name" not in onsubmit, (
+        f"onsubmit must not mutate input name attribute (causes bfcache bugs): {onsubmit}"
+    )
+    print("  ✓ Empty query submission handling verified (no DOM mutation, bfcache-safe)")
     
     # 5. Browse entry link retained
     browse_link = soup.select_one(".hero-cta a[href='archive.html']")
