@@ -412,11 +412,13 @@
       const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const escapeHtml = (s) => s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t));
 
-      entryLists.forEach((list) => {
-        list._origEntries.forEach((entry) => {
-          if (entry.parentElement !== list) list.appendChild(entry);
+      if (searchResultsList && searchResultsList.children.length > 0) {
+        entryLists.forEach((list) => {
+          list._origEntries.forEach((entry) => {
+            list.appendChild(entry);
+          });
         });
-      });
+      }
 
       entries.forEach((entry) => {
         const isHidden = !hasLanguage(entry) || !hasType(entry) || !hasSearch(entry) || (year !== 'all' && entry.dataset.year !== year);
@@ -603,6 +605,12 @@
     const initialYear = yearButtons.some((button) => button.dataset.yearFilter === initial.year) ? initial.year : 'all';
     const initialType = typeButtons.some((button) => button.dataset.typeFilter === initial.type) ? initial.type : 'all';
     const initialSort = initial.sort === 'date' ? 'date' : 'relevance';
+    // The first render syncs the address bar so a shared link that asks for a
+    // combination which cannot exist (e.g. a year with no articles left after the
+    // other filters) is rewritten to match what is actually shown — otherwise the
+    // link and the visible results disagree. It does not store the state for the
+    // article pages' "back to the list" link; that stays tied to the visitor's own
+    // filter changes.
     run(initialLanguage, initialYear, initialType, initial.q, initialSort, true, false);
     const syncYearPanel = () => { if (yearPanel) yearPanel.open = !yearNavIsCompact(); };
     syncYearPanel();
