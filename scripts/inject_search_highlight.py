@@ -76,7 +76,7 @@ new_entries_loop = '''      const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[
             // Title didn't match directly, restore title text
             titleEl.textContent = orig;
             // 2. Extract snippet from entry.dataset.search if query in body
-            const bodyText = entry.dataset.search || '';
+            const bodyText = (entry.dataset.search || '').replace(/https?:\/\/[^\s"'<>]+/gi, '').replace(/\s+/g, ' ');
             const matchIdx = bodyText.toLowerCase().indexOf(query);
             if (matchIdx !== -1) {
               const start = Math.max(0, matchIdx - 35);
