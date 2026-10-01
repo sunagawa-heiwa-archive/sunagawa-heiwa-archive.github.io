@@ -104,29 +104,27 @@
   }
 
   function mountThemeSwitch() {
-    var switchers = document.querySelectorAll('.theme-switch');
+    var nav = document.querySelector('.site-nav');
+    if (!nav) return;
+
+    var switcher = nav.querySelector('.theme-switch');
+    if (!switcher) {
+      switcher = document.createElement('div');
+      switcher.className = 'theme-switch';
+      nav.appendChild(switcher);
+    }
+
+    // Drop wrapper role and aria-label so it doesn't create landmark clutter;
+    // the button itself carries the accessible label.
+    switcher.removeAttribute('role');
+    switcher.removeAttribute('aria-label');
+
     var currentTheme = getStoredTheme();
     var cfg = THEME_CONFIG[currentTheme] || THEME_CONFIG.auto;
-
-    if (!switchers.length) {
-      var nav = document.querySelector('.site-nav');
-      if (nav) {
-        var sw = document.createElement('div');
-        sw.className = 'theme-switch';
-        nav.appendChild(sw);
-        switchers = [sw];
-      }
-    }
-
-    for (var i = 0; i < switchers.length; i++) {
-      var switcher = switchers[i];
-      switcher.setAttribute('role', 'region');
-      switcher.setAttribute('aria-label', 'Theme / テーマ切替');
-      switcher.innerHTML =
-        '<button type="button" class="theme-toggle-btn" data-theme-val="' + currentTheme + '" aria-label="' + cfg.text + '" title="' + cfg.text + '">' +
-          '<span class="theme-toggle-icon" aria-hidden="true">' + cfg.icon + '</span>' +
-        '</button>';
-    }
+    switcher.innerHTML =
+      '<button type="button" class="theme-toggle-btn" data-theme-val="' + currentTheme + '" aria-label="' + cfg.text + '" title="' + cfg.text + '">' +
+        '<span class="theme-toggle-icon" aria-hidden="true">' + cfg.icon + '</span>' +
+      '</button>';
 
     applyTheme(currentTheme);
   }
