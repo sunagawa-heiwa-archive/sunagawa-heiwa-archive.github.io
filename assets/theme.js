@@ -162,9 +162,198 @@
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountThemeSwitch);
-  } else {
+  function mountMobileNav() {
+    var siteNav = document.querySelector('.site-nav');
+    var topicsNav = document.querySelector('.topics-nav');
+    if (!siteNav || !topicsNav) return;
+
+    if (siteNav.querySelector('.menu-toggle-btn')) return;
+
+    document.documentElement.classList.add('has-mobile-nav');
+
+    var menuBtn = document.createElement('button');
+    menuBtn.type = 'button';
+    menuBtn.className = 'menu-toggle-btn';
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.setAttribute('aria-controls', 'mobile-nav-panel');
+    menuBtn.setAttribute('aria-label', 'メニュー / Menu');
+    menuBtn.innerHTML =
+      '<span class="menu-toggle-icon" aria-hidden="true">☰</span>' +
+      '<span class="menu-toggle-label">メニュー / Menu</span>';
+
+    var themeSwitch = siteNav.querySelector('.theme-switch');
+    if (themeSwitch) {
+      siteNav.insertBefore(menuBtn, themeSwitch);
+    } else {
+      siteNav.appendChild(menuBtn);
+    }
+
+    var panel = document.createElement('div');
+    panel.id = 'mobile-nav-panel';
+    panel.className = 'mobile-nav-panel';
+    panel.setAttribute('hidden', '');
+
+    var backdrop = document.createElement('div');
+    backdrop.className = 'mobile-nav-backdrop';
+    backdrop.setAttribute('tabindex', '-1');
+
+    var dialog = document.createElement('div');
+    dialog.className = 'mobile-nav-dialog';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-label', 'メニュー / Menu');
+
+    var pHeader = document.createElement('div');
+    pHeader.className = 'mobile-nav-header';
+    pHeader.innerHTML =
+      '<span class="mobile-nav-title">メニュー / Menu</span>' +
+      '<button type="button" class="mobile-nav-close-btn" aria-label="閉じる / Close menu">✕</button>';
+
+    var siteSec = document.createElement('nav');
+    siteSec.className = 'mobile-nav-section';
+    siteSec.setAttribute('aria-label', 'サイト / Site');
+    var siteTitle = document.createElement('div');
+    siteTitle.className = 'mobile-nav-section-title';
+    siteTitle.textContent = 'Site / サイト';
+    var siteLinksWrap = document.createElement('div');
+    siteLinksWrap.className = 'mobile-nav-links';
+
+    var siteLinks = siteNav.querySelectorAll('a');
+    for (var i = 0; i < siteLinks.length; i++) {
+      var sLink = siteLinks[i];
+      var sClone = sLink.cloneNode(true);
+      sClone.className = 'mobile-nav-link' + (sLink.getAttribute('aria-current') === 'page' ? ' is-current' : '');
+      siteLinksWrap.appendChild(sClone);
+    }
+    siteSec.appendChild(siteTitle);
+    siteSec.appendChild(siteLinksWrap);
+
+    var topicsSec = document.createElement('nav');
+    topicsSec.className = 'mobile-nav-section';
+    topicsSec.setAttribute('aria-label', 'テーマ / Topics');
+    var topicsTitle = document.createElement('div');
+    topicsTitle.className = 'mobile-nav-section-title';
+    topicsTitle.textContent = 'Topics / テーマ';
+    var topicsLinksWrap = document.createElement('div');
+    topicsLinksWrap.className = 'mobile-nav-links';
+
+    var topicsLinks = topicsNav.querySelectorAll('a');
+    for (var j = 0; j < topicsLinks.length; j++) {
+      var tLink = topicsLinks[j];
+      var tClone = tLink.cloneNode(true);
+      tClone.className = 'mobile-nav-link' + (tLink.getAttribute('aria-current') === 'page' ? ' is-current' : '');
+      topicsLinksWrap.appendChild(tClone);
+    }
+    topicsSec.appendChild(topicsTitle);
+    topicsSec.appendChild(topicsLinksWrap);
+
+    dialog.appendChild(pHeader);
+    dialog.appendChild(siteSec);
+    dialog.appendChild(topicsSec);
+
+    panel.appendChild(backdrop);
+    panel.appendChild(dialog);
+    document.body.appendChild(panel);
+
+    var closeBtn = pHeader.querySelector('.mobile-nav-close-btn');
+
+    function openMenu() {
+      panel.removeAttribute('hidden');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('mobile-nav-open');
+      closeBtn.focus();
+    }
+
+    function closeMenu(restoreFocus) {
+      if (panel.hasAttribute('hidden')) return;
+      panel.setAttribute('hidden', '');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('mobile-nav-open');
+      if (restoreFocus) {
+        menuBtn.focus();
+      }
+    }
+
+    function toggleMenu() {
+      if (panel.hasAttribute('hidden')) {
+        openMenu();
+      } else {
+        closeMenu(true);
+      }
+    }
+
+    menuBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeMenu(true);
+    });
+
+    backdrop.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeMenu(true);
+    });
+
+    panel.addEventListener('click', function(e) {
+      if (!dialog.contains(e.target)) {
+        closeMenu(true);
+      }
+    });
+
+    dialog.addEventListener('click', function(e) {
+      var link = e.target.closest ? e.target.closest('.mobile-nav-link') : null;
+      if (link) {
+        closeMenu(false);
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (panel.hasAttribute('hidden')) return;
+
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        e.preventDefault();
+        closeMenu(true);
+        return;
+      }
+
+      if (e.key === 'Tab' || e.keyCode === 9) {
+        var focusable = dialog.querySelectorAll('button, a[href]');
+        if (!focusable.length) return;
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768) {
+        closeMenu(false);
+      }
+    });
+  }
+
+  function initNavAndTheme() {
     mountThemeSwitch();
+    mountMobileNav();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavAndTheme);
+  } else {
+    initNavAndTheme();
   }
 })();
