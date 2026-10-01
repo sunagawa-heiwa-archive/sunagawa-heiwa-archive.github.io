@@ -222,7 +222,7 @@
     for (var i = 0; i < siteLinks.length; i++) {
       var sLink = siteLinks[i];
       var sClone = sLink.cloneNode(true);
-      sClone.className = 'mobile-nav-link' + (sLink.getAttribute('aria-current') === 'page' ? ' is-current' : '');
+      sClone.className = 'mobile-nav-link';
       siteLinksWrap.appendChild(sClone);
     }
     siteSec.appendChild(siteTitle);
@@ -241,7 +241,7 @@
     for (var j = 0; j < topicsLinks.length; j++) {
       var tLink = topicsLinks[j];
       var tClone = tLink.cloneNode(true);
-      tClone.className = 'mobile-nav-link' + (tLink.getAttribute('aria-current') === 'page' ? ' is-current' : '');
+      tClone.className = 'mobile-nav-link';
       topicsLinksWrap.appendChild(tClone);
     }
     topicsSec.appendChild(topicsTitle);
@@ -288,12 +288,10 @@
     });
 
     closeBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
       closeMenu(true);
     });
 
     backdrop.addEventListener('click', function(e) {
-      e.stopPropagation();
       closeMenu(true);
     });
 
@@ -339,8 +337,12 @@
       }
     });
 
+    var lastWidth = window.innerWidth;
     window.addEventListener('resize', function() {
-      if (window.innerWidth >= 768) {
+      var currentWidth = window.innerWidth;
+      if (currentWidth === lastWidth) return;
+      lastWidth = currentWidth;
+      if (currentWidth >= 768) {
         closeMenu(false);
       }
     });

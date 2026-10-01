@@ -139,34 +139,76 @@ def test_html_site_compatibility():
         assert len(parser.site_links) in (5, 7), f"{page_path} expected 5 or 7 site links, found {len(parser.site_links)}"
         assert len(parser.topics_links) == 4, f"{page_path} expected 4 topics links, found {len(parser.topics_links)}"
         assert len(parser.site_links) + len(parser.topics_links) >= 9, f"{page_path} total navigation links must be >= 9"
+        # Verify first link is reliably the Home link across all pages (required for mobile top-bar brand)
+        assert parser.site_links[0] in ('./', '../', '/', './index.html'), f"{page_path} first site link must be Home, got {parser.site_links[0]}"
         pages_checked += 1
 
-    print(f"  ✓ Verified all {pages_checked} HTML pages correctly provide navigation links and load theme.js")
+    print(f"  ✓ Verified all {pages_checked} HTML pages correctly provide navigation links, first link is Home, and load theme.js")
 
 def test_article_mobile_geometry():
-    print("Testing mobile viewport geometry estimates...")
-    # Verify header height and H1 position calculations
-    # .wrap padding-top = 28px (or mobile override)
-    # top bar (.site-nav single line) = 44px
-    # header padding-bottom = 12px
-    # header margin-bottom = 20px
-    # On non-article pages: header height = 44 + 12 = 56px (<= 120px)
-    # H1 top = 28 + 56 + 20 = 104px (<= 200px)
-    # On article pages with .back-nav (~30px): header height = 44 + 8 + 30 + 12 = 94px (<= 120px)
-    # H1 top = 28 + 94 + 20 = 142px (<= 200px)
-    # First paragraph top = 142 + ~80px = 222px (< 812px)
-    header_non_article = 44 + 12
-    header_article = 44 + 8 + 30 + 12
-    h1_top_non_article = 28 + header_non_article + 20
-    h1_top_article = 28 + header_article + 20
-    first_p_top = h1_top_article + 80
+    print("Testing mobile viewport geometry derived from assets/style.css...")
+    with open(os.path.join(ROOT, 'assets', 'style.css'), 'r', encoding='utf-8') as f:
+        css = f.read()
 
-    assert header_non_article <= 120, f"Non-article header height {header_non_article}px exceeds 120px"
-    assert header_article <= 120, f"Article header height {header_article}px exceeds 120px"
+    # 1. Parse .wrap padding (top)
+    wrap_pad_match = re.search(r'\.wrap\s*\{[^}]*padding:\s*(\d+)px', css)
+    assert wrap_pad_match, "Could not parse .wrap padding from style.css"
+    wrap_padding_top = int(wrap_pad_match.group(1))
+
+    # 2. Parse .site-nav a min-height and .menu-toggle-btn min-height
+    site_nav_a_match = re.search(r'\.site-nav a\s*\{[^}]*min-height:\s*(\d+)px', css)
+    assert site_nav_a_match, "Could not parse .site-nav a min-height from style.css"
+    site_nav_a_min_h = int(site_nav_a_match.group(1))
+
+    menu_btn_match = re.search(r'\.menu-toggle-btn\s*\{[^}]*min-height:\s*(\d+)px', css)
+    assert menu_btn_match, "Could not parse .menu-toggle-btn min-height from style.css"
+    menu_btn_min_h = int(menu_btn_match.group(1))
+
+    top_bar_height = max(site_nav_a_min_h, menu_btn_min_h)
+
+    # 3. Parse mobile header padding-bottom and margin-bottom from @media (max-width:767px)
+    idx = css.find('@media (max-width:767px)')
+    if idx == -1:
+        idx = css.find('@media (max-width: 767px)')
+    assert idx != -1, "Missing @media (max-width:767px) in style.css"
+    start_brace = css.find('{', idx)
+    brace_depth = 1
+    end_brace = start_brace + 1
+    while end_brace < len(css) and brace_depth > 0:
+        if css[end_brace] == '{':
+            brace_depth += 1
+        elif css[end_brace] == '}':
+            brace_depth -= 1
+        end_brace += 1
+    mobile_css = css[start_brace:end_brace]
+
+    header_pad_match = re.search(r'header\s*\{[^}]*padding-bottom:\s*(\d+)px', mobile_css)
+    assert header_pad_match, "Could not parse mobile header padding-bottom from style.css"
+    header_padding_bottom = int(header_pad_match.group(1))
+
+    header_margin_match = re.search(r'header\s*\{[^}]*margin-bottom:\s*(\d+)px', mobile_css)
+    assert header_margin_match, "Could not parse mobile header margin-bottom from style.css"
+    header_margin_bottom = int(header_margin_match.group(1))
+
+    # 4. Parse .back-nav margins
+    back_nav_match = re.search(r'\.back-nav\s*\{[^}]*margin:\s*(\d+)px\s+\d+(?:px)?\s+(\d+)px', css)
+    assert back_nav_match, "Could not parse .back-nav margins from style.css"
+    back_nav_top = int(back_nav_match.group(1))
+    back_nav_content_est = 24  # single-line text link
+
+    # 5. Compute derived geometry directly from parsed CSS rules
+    header_non_article = top_bar_height + header_padding_bottom
+    header_article = top_bar_height + back_nav_top + back_nav_content_est + header_padding_bottom
+    h1_top_non_article = wrap_padding_top + header_non_article + header_margin_bottom
+    h1_top_article = wrap_padding_top + header_article + header_margin_bottom
+    first_p_top_est = h1_top_article + 80  # H1 height + meta row
+
+    assert header_non_article <= 120, f"Non-article header {header_non_article}px exceeds 120px"
+    assert header_article <= 120, f"Article header {header_article}px exceeds 120px"
     assert h1_top_non_article <= 200, f"Non-article H1 top {h1_top_non_article}px exceeds 200px"
     assert h1_top_article <= 200, f"Article H1 top {h1_top_article}px exceeds 200px"
-    assert first_p_top < 812, f"Article first paragraph top {first_p_top}px is below 812px viewport"
-    print(f"  ✓ Header height ({header_article}px <= 120px) and H1 position ({h1_top_article}px <= 200px) verified")
+    assert first_p_top_est < 812, f"Article first paragraph top {first_p_top_est}px is below 812px viewport"
+    print(f"  ✓ Derived header height ({header_article}px <= 120px) and H1 position ({h1_top_article}px <= 200px) from parsed style.css rules")
 
 if __name__ == '__main__':
     test_source_code()
