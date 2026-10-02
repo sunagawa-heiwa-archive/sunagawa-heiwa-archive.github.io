@@ -250,12 +250,44 @@ async function run() {{
       }})()`
     }});
 
+    // 4. Desktop search mode (regression guard against text overlap/collision)
+    await send('Emulation.setDeviceMetricsOverride', {{ width: 1436, height: 818, deviceScaleFactor: 2, mobile: false }});
+    await send('Page.navigate', {{ url: '{base_url}/archive.html?q=伊達判決&sort=relevance' }});
+    await new Promise(r => setTimeout(r, 800));
+
+    const desktopSearch = await send('Runtime.evaluate', {{
+      returnByValue: true,
+      expression: `(() => {{
+        const searchInput = document.querySelector('#article-search');
+        const yearNav = document.querySelector('.sticky-bar-main .year-nav');
+        const statusText = document.querySelector('#filter-status-text');
+        const stickyBar = document.querySelector('.sticky-bar');
+        const filterStatus = document.querySelector('.filter-status');
+
+        const sRect = searchInput.getBoundingClientRect();
+        const yRect = yearNav.getBoundingClientRect();
+        const tRect = statusText.getBoundingClientRect();
+
+        // Check vertical separation: filter-status text must be below the sticky bar input
+        const verticalClearance = tRect.top - sRect.bottom;
+        // Check horizontal search bar integrity: input must not be crushed to 0
+        const searchInputWidth = sRect.width;
+
+        return {{
+          verticalClearance,
+          searchInputWidth,
+          hasSearchClass: document.body.classList.contains('has-search')
+        }};
+      }})()`
+    }});
+
     ws.close();
     chrome.kill();
     console.log(JSON.stringify({{
       mobileBrowse: mobileBrowse.result.value,
       mobileSearch: mobileSearch.result.value,
-      desktopBrowse: desktopBrowse.result.value
+      desktopBrowse: desktopBrowse.result.value,
+      desktopSearch: desktopSearch.result.value
     }}));
     process.exit(0);
   }};
@@ -289,7 +321,12 @@ run().catch(e => {{ console.error(e); process.exit(1); }});
     assert db["flexDirection"] == "row", f"Desktop flex-direction should be row, got {db['flexDirection']}"
     assert db["height"] <= 64, f"Desktop entry height {db['height']} exceeds 64px"
 
-    print("PASS: Live browser rendering metrics rigorously verified (AC 1-5, no skips)")
+    ds = data["desktopSearch"]
+    assert ds["hasSearchClass"], "Desktop search mode must have has-search class on body"
+    assert ds["searchInputWidth"] >= 180, f"Search input crushed: width {ds['searchInputWidth']} < 180px"
+    assert ds["verticalClearance"] >= 0, f"Search status text overlaps with sticky search bar: clearance {ds['verticalClearance']}px < 0"
+
+    print("PASS: Live browser rendering metrics rigorously verified (AC 1-5, no skips, no collisions)")
 
 if __name__ == "__main__":
     test_css_rules()

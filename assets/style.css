@@ -342,11 +342,11 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
 
 @media (min-width:701px) {
   .language-nav-details .language-nav-buttons { display:flex !important; }
-  .sticky-bar { display:flex; align-items:center; justify-content:space-between; gap:14px; }
-  .sticky-bar-main { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
-  .sticky-bar-main .search { flex:1; min-width:180px; max-width:380px; }
+  .sticky-bar { display:flex; align-items:center; }
+  .sticky-bar-main { display:flex; align-items:center; gap:12px; width:100%; }
+  .sticky-bar-main .search { flex:1; min-width:200px; max-width:420px; }
   .sticky-bar-main .year-nav { flex-shrink:0; }
-  .sticky-bar .filter-status { margin:0; display:flex; align-items:center; gap:10px; white-space:nowrap; }
+  .filter-status { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:14px 0 16px; }
   body:not(.has-search) .entry { flex-direction:row; align-items:center; justify-content:space-between; gap:16px; padding:10px 16px; min-height:48px; max-height:56px; }
   body:not(.has-search) .entry-title { flex:1; min-width:0; margin-bottom:0; font-size:.95rem; }
   body:not(.has-search) .entry-meta { flex-shrink:0; margin-top:0; font-size:.85rem; }
