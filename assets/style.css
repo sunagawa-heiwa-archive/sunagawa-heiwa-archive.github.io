@@ -334,8 +334,9 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
   .filter-status { align-items:flex-start; flex-direction:column; }
   .filter-actions { width:100%; justify-content:space-between; }
   .year-nav-label, .language-nav-label, .type-nav-label { display:none; }
-  .type-nav { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin:10px 0 8px; padding:2px 0 6px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-  .type-nav::-webkit-scrollbar { display:none; }
+  .type-nav { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin:10px 0 8px; padding:2px 0 6px; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
+  .type-nav::-webkit-scrollbar { height:3px; }
+  .type-nav::-webkit-scrollbar-thumb { background:var(--line); border-radius:999px; }
   .type-filter { flex-shrink:0; }
   .year-nav { padding:6px 20px 8px; margin:0 -20px 0; }
   .year-nav-summary, .language-nav-summary { display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer; list-style:none; font:inherit; font-weight:650; color:var(--ink); }
