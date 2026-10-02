@@ -237,6 +237,9 @@ h2 { line-height:1.4; }
 .no-results-reset, #no-results-reset { display:inline-flex; align-items:center; justify-content:center; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:9px 20px; min-height:44px; font:inherit; cursor:pointer; font-weight:600; }
 .no-results-reset:hover, #no-results-reset:hover { opacity:.92; }
 .year-section { scroll-margin-top:180px; margin:24px 0 32px; }
+.back-to-top { position:fixed; right:16px; bottom:16px; z-index:20; color:var(--accent-contrast); background:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:10px 14px; text-decoration:none; box-shadow:0 4px 16px var(--shadow); opacity:0; visibility:hidden; pointer-events:none; }
+.back-to-top.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
+.back-to-top:focus-visible { outline-color:var(--focus-ring); outline-offset:3px; }
 .year-section h2 { border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:12px; }
 .year-section h2 small, .month-section h3 small { color:var(--muted); font-size:.78em; font-weight:500; }
 .month-section { margin:0; }
