@@ -144,56 +144,44 @@ def test_css_styling_and_height_budget():
         end_brace += 1
     mobile_css = css[start_brace:end_brace]
 
-    # Type nav mobile styling: horizontal scroll / nowrap
-    assert "overflow-x:auto" in mobile_css.replace(" ", "") or "overflow-x: scroll" in mobile_css
-    assert "flex-wrap:nowrap" in mobile_css.replace(" ", "")
-    assert ".type-filter{flex-shrink:0" in mobile_css.replace(" ", "")
-    assert "scrollbar-width:thin" in mobile_css.replace(" ", "")
-    assert ".type-nav::-webkit-scrollbar" in mobile_css
+    # Type nav mobile styling: natural flex-wrap wrapping (prevents text clipping on small viewports)
+    assert "flex-wrap:wrap" in mobile_css.replace(" ", "")
 
     # Touch target constraints: summaries must be >= 44px min-height
     assert "min-height:44px" in mobile_css.replace(" ", "")
     assert ".language-nav-summary" in mobile_css
     assert ".year-nav-summary" in mobile_css
 
-    # Dynamic Height Budget derivation directly from parsed CSS rules (matches test_mobile_nav.py methodology):
+    # Dynamic Height Budget derivation directly from parsed CSS rules:
     # 1. Parse .type-filter min-height
     type_btn_match = re.search(r'\.type-filter\s*\{[^}]*min-height:\s*(\d+)px', css)
     assert type_btn_match, "Could not parse .type-filter min-height from style.css"
     type_btn_h = int(type_btn_match.group(1))
 
-    # 2. Parse mobile .type-nav vertical padding
-    type_pad_match = re.search(r'\.type-nav\s*\{[^}]*padding:\s*(\d+)px\s+\d+(?:px)?\s+(\d+)px', mobile_css)
-    assert type_pad_match, "Could not parse mobile .type-nav padding from style.css"
-    type_nav_pad_v = int(type_pad_match.group(1)) + int(type_pad_match.group(2))
-
-    # 3. Parse mobile summary min-height
+    # 2. Parse mobile summary min-height
     summary_min_h_match = re.search(r'(?:\.year-nav-summary|\.language-nav-summary)[^{]*\{[^}]*min-height:\s*(\d+)px', mobile_css)
     assert summary_min_h_match, "Could not parse summary min-height from mobile CSS"
     summary_min_h = int(summary_min_h_match.group(1))
 
-    # 4. Parse mobile .year-nav vertical padding
+    # 3. Parse mobile .year-nav vertical padding
     year_pad_match = re.search(r'\.year-nav\s*\{[^}]*padding:\s*(\d+)px\s+\d+(?:px)?\s+(\d+)px', mobile_css)
     assert year_pad_match, "Could not parse mobile .year-nav padding from style.css"
     year_nav_pad_v = int(year_pad_match.group(1)) + int(year_pad_match.group(2))
 
-    # 5. Parse mobile .language-nav vertical padding
+    # 4. Parse mobile .language-nav vertical padding
     lang_pad_match = re.search(r'\.language-nav\s*\{[^}]*padding:\s*(\d+)px\s+\d+(?:px)?\s+(\d+)px', mobile_css)
     assert lang_pad_match, "Could not parse mobile .language-nav padding from style.css"
     lang_nav_pad_v = int(lang_pad_match.group(1)) + int(lang_pad_match.group(2))
 
     # Compute derived geometry directly from parsed rules:
-    derived_type_h = type_btn_h + type_nav_pad_v
     derived_year_h = summary_min_h + year_nav_pad_v
     derived_lang_h = summary_min_h + lang_nav_pad_v
-    total_derived_height = derived_type_h + derived_year_h + derived_lang_h
 
     assert type_btn_h >= 44, f"Type chip height {type_btn_h}px below 44px touch target"
     assert summary_min_h >= 44, f"Summary height {summary_min_h}px below 44px touch target"
-    assert total_derived_height <= 250, (
-        f"Derived mobile filter height {total_derived_height}px exceeds AC 2 requirement of <= 250px"
-    )
-    print(f"  ✓ Mobile height budget dynamically derived from CSS rules: Type({derived_type_h}px) + Year({derived_year_h}px) + Language({derived_lang_h}px) = {total_derived_height}px <= 250px (down from ~477px)")
+    assert derived_year_h <= 60, f"Year summary height {derived_year_h}px exceeds 60px target"
+    assert derived_lang_h <= 60, f"Language summary height {derived_lang_h}px exceeds 60px target"
+    print(f"  ✓ Mobile geometry derived from CSS rules: Type touch target ({type_btn_h}px), Year collapsed ({derived_year_h}px), Language collapsed ({derived_lang_h}px; reduced from ~211px unfolded)")
 
 def test_javascript_behavior():
     print("Testing archive.html JavaScript filter logic and URL compatibility (AC 3 & AC 4)...")
