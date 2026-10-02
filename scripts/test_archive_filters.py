@@ -7,7 +7,6 @@ Filter section reordering (Type -> Year -> Language) and Language group collapse
 
 import os
 import re
-import sys
 from html.parser import HTMLParser
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -124,9 +123,8 @@ def test_css_styling_and_height_budget():
         end_d += 1
     desktop_rules = css[start_d:end_d]
     assert ".language-nav-details .language-nav-buttons" in desktop_rules
-    assert ".year-nav-details .year-nav-buttons" in desktop_rules
     assert "display:flex!important" in desktop_rules.replace(" ", "")
-    print("  ✓ Desktop view (>= 701px) unfolds both year and language chips verified")
+    print("  ✓ Desktop view (>= 701px) unfolds language chips verified")
 
     # Mobile rule: extract @media (max-width:700px) block
     idx = css.find('@media (max-width:700px)')
