@@ -443,7 +443,7 @@ mark.search-highlight {
     --muted: #555;
     --accent: #000;
   }
-  .skip-link, .search, .language-nav, .type-nav, .filter-status, .year-nav, .back-to-top, .article-nav, .site-nav, .topics-nav, .theme-switch, header a, .lightbox-dialog { display:none !important; }
+  .skip-link, .sticky-bar, .search, .language-nav, .type-nav, .filter-status, .year-nav, .back-to-top, .article-nav, .site-nav, .topics-nav, .theme-switch, header a, .lightbox-dialog { display:none !important; }
   body { background:white; color:#000; }
   .wrap { max-width:none; padding:0; }
   article, .entry, .timeline-item { break-inside:avoid; }

@@ -210,8 +210,23 @@ def test_search_input_accessibility():
     assert "clip:" in label_rules or "clip-path:" in label_rules
     print("  ✓ .search label uses accessible visually-hidden pattern (preserved in accessibility tree)")
 
+def test_print_styles():
+    print("Testing @media print styling in assets/style.css (P2 check)...")
+    css_path = os.path.join(ROOT, 'assets', 'style.css')
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css = f.read()
+
+    print_idx = css.find('@media print')
+    assert print_idx != -1, "Missing @media print block in style.css"
+    print_css = css[print_idx:]
+    assert ".sticky-bar" in print_css and "display:none!important" in print_css.replace(" ", ""), (
+        ".sticky-bar must be hidden with display:none !important in @media print to prevent empty border line"
+    )
+    print("  ✓ .sticky-bar is hidden in @media print (no stray borders when printing)")
+
 if __name__ == '__main__':
     test_archive_html_single_sticky_bar()
     test_css_sticky_bar_height_and_no_bleed()
     test_search_input_accessibility()
+    test_print_styles()
     print("\nAll search sticky bar tests passed successfully!")
