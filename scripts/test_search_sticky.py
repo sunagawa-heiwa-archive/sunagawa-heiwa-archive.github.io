@@ -153,9 +153,65 @@ def test_css_sticky_bar_height_and_no_bleed():
     type_btn_match = re.search(r'\.type-filter\s*\{[^}]*min-height:\s*(\d+)px', css)
     assert type_btn_match and int(type_btn_match.group(1)) >= 44
 
+    # Derived height math:
+    # Desktop: .sticky-bar top/bottom padding 20px + border 1px + input 44px = 65px base (rendered ~69.8px <= 72px)
+    sticky_bar_padding = re.search(r'\.sticky-bar\s*\{[^}]*padding:\s*(\d+)px\s+(\d+)px', css)
+    assert sticky_bar_padding, "Missing .sticky-bar padding definition"
+    desktop_pad = int(sticky_bar_padding.group(1)) * 2
+    desktop_derived_base = desktop_pad + 1 + 44  # padding + border-bottom + min-height
+    assert desktop_derived_base <= 72, f"Desktop derived height {desktop_derived_base}px exceeds 72px budget"
+
+    # Mobile: .sticky-bar-main top/bottom padding 16px + border 1px + input 44px = 61px base (rendered ~61.5px <= 64px)
+    mobile_main_padding = re.search(r'\.sticky-bar-main\s*\{[^}]*padding:\s*(\d+)px\s+(\d+)px', mobile_css)
+    assert mobile_main_padding, "Missing .sticky-bar-main mobile padding definition"
+    mobile_pad = int(mobile_main_padding.group(1)) * 2
+    mobile_derived_base = mobile_pad + 1 + 44
+    assert mobile_derived_base <= 64, f"Mobile derived height {mobile_derived_base}px exceeds 64px budget"
+
+    print(f"  ✓ Derived CSS height math: desktop base {desktop_derived_base}px <= 72px, mobile base {mobile_derived_base}px <= 64px")
     print("  ✓ Sticky bar geometry verified: desktop <= 72px, mobile <= 64px, touch targets >= 44px")
+
+def test_search_input_accessibility():
+    print("Testing search input accessibility (screen reader name, label & aria-label)...")
+    archive_path = os.path.join(ROOT, 'archive.html')
+    with open(archive_path, 'r', encoding='utf-8') as f:
+        html = f.read()
+
+    css_path = os.path.join(ROOT, 'assets', 'style.css')
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css = f.read()
+
+    # 1. <label for="article-search"> exists with bilingual text
+    assert '<label for="article-search">Search articles / 記事検索</label>' in html, (
+        "archive.html must have an explicit <label for=\"article-search\">"
+    )
+    # 2. <input id="article-search"> has aria-label for assistive tech
+    assert 'id="article-search"' in html and 'aria-label="Search articles / 記事検索"' in html, (
+        "archive.html #article-search must have aria-label=\"Search articles / 記事検索\""
+    )
+    print("  ✓ <label for=\"article-search\"> and aria-label present in HTML")
+
+    # 3. .search label in CSS must NOT be display:none or visibility:hidden (preserves a11y tree)
+    label_css_match = re.search(r'\.search\s+label\s*\{([^}]+)\}', css)
+    assert label_css_match, "Missing .search label rule in assets/style.css"
+    label_rules = label_css_match.group(1).replace(" ", "")
+    assert "display:none" not in label_rules, (
+        ".search label must not use display:none (removes label from accessibility tree)"
+    )
+    assert "visibility:hidden" not in label_rules, (
+        ".search label must not use visibility:hidden"
+    )
+
+    # 4. Must use visually-hidden pattern (position:absolute, clip/clip-path, width/height:1px)
+    assert "position:absolute" in label_rules
+    assert "width:1px" in label_rules
+    assert "height:1px" in label_rules
+    assert "overflow:hidden" in label_rules
+    assert "clip:" in label_rules or "clip-path:" in label_rules
+    print("  ✓ .search label uses accessible visually-hidden pattern (preserved in accessibility tree)")
 
 if __name__ == '__main__':
     test_archive_html_single_sticky_bar()
     test_css_sticky_bar_height_and_no_bleed()
+    test_search_input_accessibility()
     print("\nAll search sticky bar tests passed successfully!")

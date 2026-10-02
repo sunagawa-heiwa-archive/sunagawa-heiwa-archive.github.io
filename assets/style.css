@@ -194,7 +194,7 @@ h2 { line-height:1.4; }
 .sticky-bar { position:sticky; top:0; z-index:20; background:var(--paper); border-bottom:1px solid var(--line); margin:0 -20px 14px; padding:10px 20px; }
 .sticky-bar-main { display:flex; align-items:center; gap:12px; }
 .search { margin:0; padding:0; }
-.search label { display:none; }
+.search label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); clip-path:inset(50%); white-space:nowrap; border:0; }
 .search input { width:100%; min-height:44px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:var(--surface); color:var(--ink); font:inherit; }
 .no-results { display:none; text-align:center; padding:48px 20px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:24px 0 32px; }
 .no-results:not([hidden]) { display:block; }
