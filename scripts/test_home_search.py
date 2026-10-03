@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test home search form implementation in index.html (SITES-10 / SUNA-9)
+Test home search form implementation in index.html (SITES-24)
 
 Verifies:
 1. index.html contains a pure GET form pointing to archive.html with search input and submit button.
