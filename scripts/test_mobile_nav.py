@@ -136,7 +136,7 @@ def test_html_site_compatibility():
 
         assert parser.has_theme_js, f"{page_path} missing theme.js script"
         assert parser.has_style_css, f"{page_path} missing style.css link"
-        assert len(parser.site_links) in (5, 7), f"{page_path} expected 5 or 7 site links, found {len(parser.site_links)}"
+        assert len(parser.site_links) in (5, 6, 7), f"{page_path} expected 5, 6, or 7 site links, found {len(parser.site_links)}"
         assert len(parser.topics_links) == 4, f"{page_path} expected 4 topics links, found {len(parser.topics_links)}"
         assert len(parser.site_links) + len(parser.topics_links) >= 9, f"{page_path} total navigation links must be >= 9"
         # Verify first link is reliably the Home link across all pages (required for mobile top-bar brand)

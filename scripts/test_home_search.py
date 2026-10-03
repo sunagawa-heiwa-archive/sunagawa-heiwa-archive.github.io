@@ -77,7 +77,7 @@ def test_home_search_form():
     )
     print("  ✓ Browse link for all 208 articles retained")
     
-    # 6. Page order: H1 -> lede -> search -> hero-intro -> hero-position
+    # 6. Page order per SITES-24: H1 -> lede -> intro -> position -> search -> guide card
     main = soup.find("main", id="main")
     assert main is not None, "main#main not found"
     main_text = str(main)
@@ -86,10 +86,10 @@ def test_home_search_form():
     pos_position = main_text.find("hero-position")
     
     assert pos_form != -1 and pos_intro != -1 and pos_position != -1, "Expected sections not found in main"
-    assert pos_form < pos_intro < pos_position, (
-        f"Order violation: search ({pos_form}) must be before intro ({pos_intro}) and position ({pos_position})"
+    assert pos_intro < pos_position < pos_form, (
+        f"Order violation: intro ({pos_intro}) and position ({pos_position}) must precede search ({pos_form}) per SITES-24"
     )
-    print("  ✓ Reading order verified (search -> intro -> position)")
+    print("  ✓ Reading order verified (intro -> position -> search per SITES-24)")
 
 
 def test_archive_search_integration():

@@ -80,15 +80,7 @@ header { border-bottom:1px solid var(--line); margin-bottom:28px; padding-bottom
 .site-nav .en-pill { display:inline-flex; align-items:center; gap:4px; min-height:28px; padding:2px 10px; border:1px solid var(--line); border-radius:999px; font-size:.82rem; font-weight:600; color:var(--accent); background:var(--surface); line-height:1.4; text-decoration:none; }
 .site-nav .en-pill:hover { border-color:var(--accent); background:var(--surface-subtle); }
 .home-page .home-topics-nav { display:none !important; }
-@media (min-width:768px) {
-  .home-page .site-nav { flex-wrap:nowrap; gap:14px; }
-  .home-page .site-nav a { white-space:nowrap; font-size:.92rem; }
-}
 .mobile-only { display:none; }
-@media (max-width:767px) {
-  .desktop-only { display:none; }
-  .mobile-only { display:inline; }
-}
 .topics-nav { display:flex; flex-wrap:wrap; align-items:center; gap:4px 18px; margin:0 0 16px; padding:6px 0 0; border-top:1px solid var(--line); }
 .topics-nav a { display:inline-flex; align-items:center; min-height:40px; color:var(--accent); text-decoration:none; font-size:.95rem; }
 .topics-nav a[aria-current="page"] { color:var(--ink); font-weight:650; }
@@ -125,6 +117,8 @@ header { border-bottom:1px solid var(--line); margin-bottom:28px; padding-bottom
 body.mobile-nav-open { overflow:hidden; }
 @media (min-width:768px) {
   .menu-toggle-btn, .mobile-nav-panel { display:none !important; }
+  .home-page .site-nav { flex-wrap:nowrap; gap:14px; }
+  .home-page .site-nav a { white-space:nowrap; font-size:.92rem; }
 }
 @media (max-width:767px) {
   .has-mobile-nav .site-nav { display:flex; flex-wrap:nowrap; align-items:center; gap:8px; margin:0 0 12px; }
@@ -133,6 +127,8 @@ body.mobile-nav-open { overflow:hidden; }
   .has-mobile-nav .topics-nav { display:none; }
   .has-mobile-nav .menu-toggle-btn { display:inline-flex; margin-left:auto; flex-shrink:0; }
   .has-mobile-nav .theme-switch { margin-left:0; flex-shrink:0; }
+  .desktop-only { display:none; }
+  .mobile-only { display:inline; }
   header { margin-bottom:20px; padding-bottom:12px; }
 }
 @media (max-width:360px) {
