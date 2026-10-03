@@ -117,8 +117,12 @@ header { border-bottom:1px solid var(--line); margin-bottom:28px; padding-bottom
 body.mobile-nav-open { overflow:hidden; }
 @media (min-width:768px) {
   .menu-toggle-btn, .mobile-nav-panel { display:none !important; }
+  .home-page .site-nav { flex-wrap:wrap; gap:4px 12px; }
+  .home-page .site-nav a { white-space:nowrap; font-size:.88rem; }
+}
+@media (min-width:820px) {
   .home-page .site-nav { flex-wrap:nowrap; gap:14px; }
-  .home-page .site-nav a { white-space:nowrap; font-size:.92rem; }
+  .home-page .site-nav a { font-size:.92rem; }
 }
 @media (max-width:767px) {
   .has-mobile-nav .site-nav { display:flex; flex-wrap:nowrap; align-items:center; gap:8px; margin:0 0 12px; }
@@ -129,6 +133,8 @@ body.mobile-nav-open { overflow:hidden; }
   .has-mobile-nav .theme-switch { margin-left:0; flex-shrink:0; }
   .desktop-only { display:none; }
   .mobile-only { display:inline; }
+  .hero-search-row input { min-height:44px; }
+  .hero-search-btn { min-height:44px; }
   header { margin-bottom:20px; padding-bottom:12px; }
 }
 @media (max-width:360px) {
@@ -144,9 +150,9 @@ h2 { line-height:1.4; }
 .hero-search-form { margin:0 0 10px; }
 .hero-search-label { display:block; color:var(--muted); font-size:.92rem; font-weight:600; margin-bottom:6px; }
 .hero-search-row { display:flex; gap:8px; align-items:center; max-width:620px; }
-.hero-search-row input { flex:1; min-width:0; height:38px; min-height:38px; border:1px solid var(--line); border-radius:8px; padding:0 12px; background:var(--surface); color:var(--ink); font:inherit; font-size:.92rem; }
+.hero-search-row input { flex:1; min-width:0; height:40px; min-height:40px; border:1px solid var(--line); border-radius:8px; padding:0 12px; background:var(--surface); color:var(--ink); font:inherit; font-size:.92rem; }
 .hero-search-row input:focus-visible { outline:2px solid var(--focus-ring); outline-offset:1px; }
-.hero-search-btn { height:38px; min-height:38px; padding:0 16px; border:1px solid var(--accent); border-radius:8px; background:var(--accent); color:var(--accent-contrast); font-weight:650; font:inherit; font-size:.9rem; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; }
+.hero-search-btn { height:40px; min-height:40px; padding:0 16px; border:1px solid var(--accent); border-radius:8px; background:var(--accent); color:var(--accent-contrast); font-weight:650; font:inherit; font-size:.9rem; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; }
 .hero-search-btn:hover { opacity:.92; }
 .hero-search-btn:focus-visible { outline:2px solid var(--focus-ring); outline-offset:2px; }
 @media (max-width:360px) {

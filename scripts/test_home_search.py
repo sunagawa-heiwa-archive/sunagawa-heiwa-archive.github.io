@@ -7,7 +7,7 @@ Verifies:
 2. Label for search input is visible and accessible (contains '記事検索 / Search articles').
 3. Empty query submission omits 'q' parameter or navigates directly to archive.html.
 4. Retains browse entry link for all 208 articles.
-5. Reading order matches SUNA-11 (H1 -> lede -> search -> hero-intro -> hero-position).
+5. Reading order matches SITES-24 (H1 -> lede -> intro -> position -> search -> guide card).
 6. Integration check: archive.html handles 'q' query parameter properly (e.g. '伊達判決').
 """
 
