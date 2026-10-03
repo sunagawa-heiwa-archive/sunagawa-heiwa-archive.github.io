@@ -32,7 +32,9 @@ def test_css_rules():
     assert re.search(r'body\.has-search\s+\.month-section\s+h3\s*\{\s*display:\s*block;', css), \
         "CSS must restore .month-section h3 in search mode"
 
-    # 2. Compact row styling for .entry (height <= 64px, single-line ellipsis)
+    # 2. Compact row styling for .entry (height <= 64px, single-line ellipsis, locked column)
+    assert re.search(r'\.entry-list\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)', css), \
+        "CSS must lock .entry-list column to minmax(0, 1fr) to prevent overflow blowout"
     assert re.search(r'\.entry\s*\{[^}]*max-height:\s*64px', css), \
         "CSS must specify max-height <= 64px for compact entries"
     assert re.search(r'\.entry-title\s*\{[^}]*text-overflow:\s*ellipsis', css), \
@@ -243,9 +245,16 @@ async function run() {{
       expression: `(() => {{
         const firstEntry = document.querySelector('.entry');
         const style = window.getComputedStyle(firstEntry);
+        const entries = Array.from(document.querySelectorAll('.entry'));
+        const widths = entries.map(e => e.getBoundingClientRect().width);
+        const minW = Math.min(...widths);
+        const maxW = Math.max(...widths);
         return {{
           flexDirection: style.flexDirection,
-          height: firstEntry.getBoundingClientRect().height
+          height: firstEntry.getBoundingClientRect().height,
+          allWidthsEqual: minW === maxW,
+          minEntryWidth: minW,
+          maxEntryWidth: maxW
         }};
       }})()`
     }});
@@ -320,6 +329,7 @@ run().catch(e => {{ console.error(e); process.exit(1); }});
     db = data["desktopBrowse"]
     assert db["flexDirection"] == "row", f"Desktop flex-direction should be row, got {db['flexDirection']}"
     assert db["height"] <= 64, f"Desktop entry height {db['height']} exceeds 64px"
+    assert db["allWidthsEqual"], f"All desktop entry widths must be equal (got min={db['minEntryWidth']}px, max={db['maxEntryWidth']}px)"
 
     ds = data["desktopSearch"]
     assert ds["hasSearchClass"], "Desktop search mode must have has-search class on body"

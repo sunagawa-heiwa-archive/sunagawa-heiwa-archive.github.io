@@ -294,7 +294,7 @@ h2 { line-height:1.4; }
 .month-section h3 { display:none; color:var(--accent); margin:0 0 10px; font-size:1.08rem; }
 body.has-search .month-section h3 { display:block; }
 body.has-search .month-section { margin:24px 0 28px; }
-.entry-list { display:grid; gap:6px; }
+.entry-list { display:grid; grid-template-columns:minmax(0, 1fr); gap:6px; }
 .entry { display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line); border-radius:8px; padding:8px 12px; min-height:52px; max-height:64px; background:var(--surface); text-decoration:none; scroll-margin-top:180px; box-sizing:border-box; }
 .entry:hover { border-color:var(--accent); }
 .entry-title { display:block; color:var(--ink); font-weight:650; font-size:.92rem; line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
