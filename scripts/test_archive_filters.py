@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Test suite for SITES-21 (PRD SUNA-14):
-Filter section reordering (Type -> Year -> Language) and Language group collapse.
-100% standard library Python — zero external dependencies.
+Test suite for archive filters:
+- Structural HTML assertions (Type -> Year -> Language ordering, details/summary controls)
+- CSS and height budgets
+- Live Chrome viewport tests using standard library Python + embedded Node.js (requires Node and Chrome)
 """
 
 import http.server
@@ -13,7 +14,6 @@ import shutil
 import socket
 import subprocess
 import threading
-import time
 from html.parser import HTMLParser
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -340,11 +340,15 @@ async function run() {{
         const typeSummary = document.querySelector('.type-nav-summary');
         const typeButtons = document.querySelector('.type-nav-buttons');
         const buttons = [...document.querySelectorAll('.type-filter')];
+        const noteEl = document.querySelector('p.year-gap.note');
+        const noteRect = noteEl ? noteEl.getBoundingClientRect() : null;
+        const notePointEl = noteRect ? document.elementFromPoint(noteRect.left + 5, noteRect.top + 5) : null;
         return {{
           typeSummaryDisplay: window.getComputedStyle(typeSummary).display,
           typeButtonsDisplay: window.getComputedStyle(typeButtons).display,
           typeButtonsCount: buttons.length,
-          allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0)
+          allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0),
+          noteVisible: Boolean(noteRect && noteRect.height > 0 && (notePointEl === noteEl || (noteEl && noteEl.contains(notePointEl))))
         }};
       }})()`
     }});
@@ -376,7 +380,8 @@ run().catch(e => {{ console.error(e); process.exit(1); }});
         assert d_val['typeButtonsDisplay'] == 'flex', "Type buttons should be display: flex on desktop"
         assert d_val['typeButtonsCount'] == 9, f"Expected 9 type buttons, found {d_val['typeButtonsCount']}"
         assert d_val['allButtonsVisible'], "All 9 type buttons must be visible on desktop"
-        print("  ✓ Desktop view (1024px): type buttons unfolded (display: flex) and all 9 buttons visible")
+        assert d_val['noteVisible'], "Archive note text ('収録メモ') must be rendered and visible on desktop"
+        print("  ✓ Desktop view (1024px): type buttons unfolded (display: flex), all 9 buttons visible, archive note rendered")
     finally:
         server.shutdown()
 

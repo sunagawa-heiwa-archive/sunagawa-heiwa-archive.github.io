@@ -344,6 +344,7 @@
     const yearButtons = [...document.querySelectorAll('[data-year-filter]')];
     const yearPanel = document.querySelector('.year-nav-details');
     const yearCurrent = document.querySelector('#year-nav-current');
+    const notePanel = document.querySelector('.note-details');
     const filterNavIsCompact = () => window.matchMedia('(max-width:700px)').matches;
     const entries = [...document.querySelectorAll('.entry[data-language]')];
     const entryLists = [...document.querySelectorAll('.month-section .entry-list')];
@@ -682,6 +683,7 @@
       if (yearPanel) yearPanel.open = false;
       if (languagePanel) languagePanel.open = isDesktop;
       if (typePanel) typePanel.open = isDesktop;
+      if (notePanel) notePanel.open = isDesktop;
     };
     syncFilterPanels();
     window.matchMedia('(max-width:700px)').addEventListener('change', syncFilterPanels);
