@@ -7,6 +7,7 @@ Filter section reordering (Type -> Year -> Language) and Language group collapse
 
 import os
 import re
+import time
 from html.parser import HTMLParser
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -21,10 +22,13 @@ class ArchiveFilterParser(HTMLParser):
         self.type_filters = []
         self.year_filters = []
         self.language_filters = []
+        self.has_type_details = False
         self.has_year_details = False
         self.has_language_details = False
+        self.has_type_summary = False
         self.has_year_summary = False
         self.has_language_summary = False
+        self.type_current_id = False
         self.language_current_id = False
         self.year_current_id = False
 
@@ -43,15 +47,21 @@ class ArchiveFilterParser(HTMLParser):
             self.nav_order.append('language')
             self.in_language_nav = True
 
+        if 'type-nav-details' in classes:
+            self.has_type_details = True
         if 'year-nav-details' in classes:
             self.has_year_details = True
         if 'language-nav-details' in classes:
             self.has_language_details = True
+        if 'type-nav-summary' in classes:
+            self.has_type_summary = True
         if 'year-nav-summary' in classes:
             self.has_year_summary = True
         if 'language-nav-summary' in classes:
             self.has_language_summary = True
 
+        if tag_id == 'type-nav-current':
+            self.type_current_id = True
         if tag_id == 'year-nav-current':
             self.year_current_id = True
         if tag_id == 'language-nav-current':
@@ -71,7 +81,7 @@ class ArchiveFilterParser(HTMLParser):
             self.in_language_nav = False
 
 def test_archive_html_structure():
-    print("Testing archive.html DOM structure and filter order (AC 1 & AC 3)...")
+    print("Testing archive.html DOM structure and filter order (AC 1 & AC 4)...")
     archive_path = os.path.join(ROOT, 'archive.html')
     with open(archive_path, 'r', encoding='utf-8') as f:
         html = f.read()
@@ -84,6 +94,14 @@ def test_archive_html_structure():
         f"Filter order must be ['type', 'year', 'language'], got {parser.nav_order}"
     )
     print("  ✓ Filter DOM order confirmed: 種類 (Type) -> 年別 (Year) -> 記事の言語 (Language)")
+
+    # AC 1: Type details & summary structure (SITES-38)
+    assert parser.has_type_details, "Missing .type-nav-details in archive.html"
+    assert parser.has_type_summary, "Missing .type-nav-summary in archive.html"
+    assert parser.type_current_id, "Missing #type-nav-current in archive.html"
+    expected_types = ['all', 'guide', 'lawsuit', 'gathering', 'links', 'newsletter', 'notice', 'community', 'record']
+    assert parser.type_filters == expected_types, f"Expected 9 type filters {expected_types}, got {parser.type_filters}"
+    print("  ✓ Type details/summary dropdown with all 9 filters verified")
 
     # AC 3: Language details & summary structure
     assert parser.has_language_details, "Missing .language-nav-details in archive.html"
@@ -123,8 +141,9 @@ def test_css_styling_and_height_budget():
         end_d += 1
     desktop_rules = css[start_d:end_d]
     assert ".language-nav-details .language-nav-buttons" in desktop_rules
+    assert ".type-nav-details .type-nav-buttons" in desktop_rules
     assert "display:flex!important" in desktop_rules.replace(" ", "")
-    print("  ✓ Desktop view (>= 701px) unfolds language chips verified")
+    print("  ✓ Desktop view (>= 701px) unfolds language and type chips verified")
 
     # Mobile rule: extract @media (max-width:700px) block
     idx = css.find('@media (max-width:700px)')
@@ -148,6 +167,7 @@ def test_css_styling_and_height_budget():
     # Touch target constraints: summaries must be >= 44px min-height
     assert "min-height:44px" in mobile_css.replace(" ", "")
     assert ".language-nav-summary" in mobile_css
+    assert ".type-nav-summary" in mobile_css
     assert ".year-nav-summary" in mobile_css
 
     # Dynamic Height Budget derivation directly from parsed CSS rules:
@@ -157,7 +177,7 @@ def test_css_styling_and_height_budget():
     type_btn_h = int(type_btn_match.group(1))
 
     # 2. Parse mobile summary min-height
-    summary_min_h_match = re.search(r'(?:\.year-nav-summary|\.language-nav-summary)[^{]*\{[^}]*min-height:\s*(\d+)px', mobile_css)
+    summary_min_h_match = re.search(r'(?:\.year-nav-summary|\.language-nav-summary|\.type-nav-summary)[^{]*\{[^}]*min-height:\s*(\d+)px', mobile_css)
     assert summary_min_h_match, "Could not parse summary min-height from mobile CSS"
     summary_min_h = int(summary_min_h_match.group(1))
 
@@ -172,13 +192,19 @@ def test_css_styling_and_height_budget():
     assert type_btn_h >= 44, f"Type chip height {type_btn_h}px below 44px touch target"
     assert summary_min_h >= 44, f"Summary height {summary_min_h}px below 44px touch target"
     assert derived_lang_h <= 60, f"Language summary height {derived_lang_h}px exceeds 60px target"
-    print(f"  ✓ Mobile geometry derived from CSS rules: Type touch target ({type_btn_h}px), Language collapsed ({derived_lang_h}px; reduced from ~211px unfolded)")
+    print(f"  ✓ Mobile geometry derived from CSS rules: Type touch target ({type_btn_h}px), Language collapsed ({derived_lang_h}px)")
 
 def test_javascript_behavior():
-    print("Testing archive.html JavaScript filter logic and URL compatibility (AC 3 & AC 4)...")
+    print("Testing archive.html JavaScript filter logic and URL compatibility (AC 1, AC 3 & AC 4)...")
     archive_path = os.path.join(ROOT, 'archive.html')
     with open(archive_path, 'r', encoding='utf-8') as f:
         html = f.read()
+
+    # AC 1: Type summary label update and collapse logic
+    assert "typeCurrent.textContent" in html, "archive.html must update #type-nav-current textContent"
+    assert "typePanel.open = false" in html, "Selecting type on mobile must collapse the dropdown"
+    assert "typePanel.open = isDesktop" in html, "syncFilterPanels must keep typePanel open on desktop"
+    print("  ✓ Type dropdown selection and summary text update verified")
 
     # AC 3: 0-count options disabled logic
     assert "button.disabled = langValue !== 'all' && langValue !== language && langCount === 0;" in html, (
@@ -203,8 +229,188 @@ def test_javascript_behavior():
     assert "p.get('type') || 'all'" in html
     print("  ✓ URL parameter compatibility (type, year, language) verified on refresh and sharing")
 
+def test_live_viewport_above_the_fold():
+    print("Testing live browser viewport height budget at 375px & 608px (AC 2 & AC 3)...")
+    chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    if not os.path.exists(chrome_path):
+        print("  ⚠ Google Chrome not found at default location; skipping live headless test")
+        return
+
+    import socket
+    import subprocess
+    import http.server
+    import socketserver
+    import threading
+    import urllib.request
+    import json
+    import websocket
+
+    for width in [375, 608]:
+        with socket.socket() as s:
+            s.bind(('127.0.0.1', 0))
+            port = s.getsockname()[1]
+        with socket.socket() as s:
+            s.bind(('127.0.0.1', 0))
+            debug_port = s.getsockname()[1]
+
+        class QuietHandler(http.server.SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=ROOT, **kwargs)
+            def log_message(self, format, *args):
+                pass
+
+        httpd = socketserver.TCPServer(('127.0.0.1', port), QuietHandler)
+        t = threading.Thread(target=httpd.serve_forever, daemon=True)
+        t.start()
+
+        proc = subprocess.Popen([
+            chrome_path,
+            '--headless=new',
+            '--disable-gpu',
+            f'--remote-debugging-port={debug_port}',
+            '--remote-allow-origins=*',
+            f'http://127.0.0.1:{port}/archive.html?q=%E4%BC%8A%E9%81%94%E5%88%A4%E6%B1%BA'
+        ], stderr=subprocess.DEVNULL)
+
+        try:
+            time.sleep(1.0)
+            targets = json.loads(urllib.request.urlopen(f'http://127.0.0.1:{debug_port}/json').read().decode())
+            page_target = [tg for tg in targets if tg.get('type') == 'page'][0]
+            ws_url = page_target['webSocketDebuggerUrl']
+            ws = websocket.create_connection(ws_url)
+
+            def send_cmd(cmd_id, method, params=None):
+                msg = {'id': cmd_id, 'method': method}
+                if params:
+                    msg['params'] = params
+                ws.send(json.dumps(msg))
+                while True:
+                    r = json.loads(ws.recv())
+                    if r.get('id') == cmd_id:
+                        return r
+
+            send_cmd(1, 'Emulation.setDeviceMetricsOverride', {
+                'width': width,
+                'height': 812,
+                'deviceScaleFactor': 1,
+                'mobile': True
+            })
+
+            time.sleep(1.5)
+
+            expr = '''
+            (() => {
+              const firstEntry = document.querySelector('.search-results-list .entry');
+              const searchBox = document.querySelector('#article-search');
+              const statusText = document.querySelector('#filter-status-text');
+              const rect = firstEntry ? firstEntry.getBoundingClientRect() : null;
+              return {
+                width: window.innerWidth,
+                firstEntryTop: rect ? Math.round(rect.top) : null,
+                firstEntryFound: Boolean(firstEntry),
+                searchVisible: Boolean(searchBox),
+                status: statusText ? statusText.textContent : ''
+              };
+            })()
+            '''
+            res = send_cmd(10, 'Runtime.evaluate', {'expression': expr, 'returnByValue': True})
+            val = res['result']['result']['value']
+            ws.close()
+
+            assert val['searchVisible'], f"Search box not visible at {width}px"
+            assert "45" in val['status'], f"Active result count not 45 at {width}px: {val['status']}"
+            assert val['firstEntryFound'], f"First article entry not found at {width}px"
+            assert val['firstEntryTop'] is not None and val['firstEntryTop'] <= 450, (
+                f"First entry top {val['firstEntryTop']}px exceeds 450px budget at {width}px"
+            )
+            print(f"  ✓ Viewport {width}px: first entry top = {val['firstEntryTop']}px (<= 450px), search & count visible")
+        finally:
+            proc.terminate()
+            proc.wait()
+            httpd.shutdown()
+
+    # Desktop check: unfolded buttons at 1024px
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0))
+        port = s.getsockname()[1]
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0))
+        debug_port = s.getsockname()[1]
+
+    class QuietHandler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=ROOT, **kwargs)
+        def log_message(self, format, *args):
+            pass
+
+    httpd = socketserver.TCPServer(('127.0.0.1', port), QuietHandler)
+    t = threading.Thread(target=httpd.serve_forever, daemon=True)
+    t.start()
+
+    proc = subprocess.Popen([
+        chrome_path,
+        '--headless=new',
+        '--disable-gpu',
+        f'--remote-debugging-port={debug_port}',
+        '--remote-allow-origins=*',
+        f'http://127.0.0.1:{port}/archive.html'
+    ], stderr=subprocess.DEVNULL)
+
+    try:
+        time.sleep(1.0)
+        targets = json.loads(urllib.request.urlopen(f'http://127.0.0.1:{debug_port}/json').read().decode())
+        page_target = [tg for tg in targets if tg.get('type') == 'page'][0]
+        ws_url = page_target['webSocketDebuggerUrl']
+        ws = websocket.create_connection(ws_url)
+
+        def send_cmd(cmd_id, method, params=None):
+            msg = {'id': cmd_id, 'method': method}
+            if params:
+                msg['params'] = params
+            ws.send(json.dumps(msg))
+            while True:
+                r = json.loads(ws.recv())
+                if r.get('id') == cmd_id:
+                    return r
+
+        send_cmd(1, 'Emulation.setDeviceMetricsOverride', {
+            'width': 1024,
+            'height': 800,
+            'deviceScaleFactor': 1,
+            'mobile': False
+        })
+        time.sleep(1.5)
+
+        expr = '''
+        (() => {
+          const typeSummary = document.querySelector('.type-nav-summary');
+          const typeButtons = document.querySelector('.type-nav-buttons');
+          const buttons = [...document.querySelectorAll('.type-filter')];
+          return {
+            typeSummaryDisplay: window.getComputedStyle(typeSummary).display,
+            typeButtonsDisplay: window.getComputedStyle(typeButtons).display,
+            typeButtonsCount: buttons.length,
+            allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0)
+          };
+        })()
+        '''
+        res = send_cmd(10, 'Runtime.evaluate', {'expression': expr, 'returnByValue': True})
+        val = res['result']['result']['value']
+        ws.close()
+
+        assert val['typeSummaryDisplay'] == 'none', "Type summary should be hidden on desktop"
+        assert val['typeButtonsDisplay'] == 'flex', "Type buttons should be display: flex on desktop"
+        assert val['typeButtonsCount'] == 9, f"Expected 9 type buttons, found {val['typeButtonsCount']}"
+        assert val['allButtonsVisible'], "All 9 type buttons must be visible on desktop"
+        print("  ✓ Desktop view (1024px): type buttons unfolded (display: flex) and all 9 buttons visible")
+    finally:
+        proc.terminate()
+        proc.wait()
+        httpd.shutdown()
+
 if __name__ == '__main__':
     test_archive_html_structure()
     test_css_styling_and_height_budget()
     test_javascript_behavior()
+    test_live_viewport_above_the_fold()
     print("\nAll archive filter tests passed successfully!")
