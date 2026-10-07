@@ -5,8 +5,14 @@ Filter section reordering (Type -> Year -> Language) and Language group collapse
 100% standard library Python — zero external dependencies.
 """
 
+import http.server
+import json
 import os
 import re
+import shutil
+import socket
+import subprocess
+import threading
 import time
 from html.parser import HTMLParser
 
@@ -231,182 +237,148 @@ def test_javascript_behavior():
 
 def test_live_viewport_above_the_fold():
     print("Testing live browser viewport height budget at 375px & 608px (AC 2 & AC 3)...")
-    chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-    if not os.path.exists(chrome_path):
-        print("  ⚠ Google Chrome not found at default location; skipping live headless test")
-        return
+    chrome_bin = (
+        shutil.which("google-chrome")
+        or shutil.which("chromium")
+        or shutil.which("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+    )
+    if not chrome_bin and os.path.exists("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"):
+        chrome_bin = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
-    import socket
-    import subprocess
-    import http.server
-    import socketserver
-    import threading
-    import urllib.request
-    import json
-    import websocket
+    if not chrome_bin:
+        raise RuntimeError("Google Chrome or Chromium is required for live browser tests. Chrome binary not found.")
 
-    for width in [375, 608]:
-        with socket.socket() as s:
-            s.bind(('127.0.0.1', 0))
-            port = s.getsockname()[1]
-        with socket.socket() as s:
-            s.bind(('127.0.0.1', 0))
-            debug_port = s.getsockname()[1]
+    node_bin = shutil.which("node")
+    if not node_bin:
+        raise RuntimeError("Node.js is required for headless browser automation. node binary not found.")
 
-        class QuietHandler(http.server.SimpleHTTPRequestHandler):
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, directory=ROOT, **kwargs)
-            def log_message(self, format, *args):
-                pass
-
-        httpd = socketserver.TCPServer(('127.0.0.1', port), QuietHandler)
-        t = threading.Thread(target=httpd.serve_forever, daemon=True)
-        t.start()
-
-        proc = subprocess.Popen([
-            chrome_path,
-            '--headless=new',
-            '--disable-gpu',
-            f'--remote-debugging-port={debug_port}',
-            '--remote-allow-origins=*',
-            f'http://127.0.0.1:{port}/archive.html?q=%E4%BC%8A%E9%81%94%E5%88%A4%E6%B1%BA'
-        ], stderr=subprocess.DEVNULL)
-
-        try:
-            time.sleep(1.0)
-            targets = json.loads(urllib.request.urlopen(f'http://127.0.0.1:{debug_port}/json').read().decode())
-            page_target = [tg for tg in targets if tg.get('type') == 'page'][0]
-            ws_url = page_target['webSocketDebuggerUrl']
-            ws = websocket.create_connection(ws_url)
-
-            def send_cmd(cmd_id, method, params=None):
-                msg = {'id': cmd_id, 'method': method}
-                if params:
-                    msg['params'] = params
-                ws.send(json.dumps(msg))
-                while True:
-                    r = json.loads(ws.recv())
-                    if r.get('id') == cmd_id:
-                        return r
-
-            send_cmd(1, 'Emulation.setDeviceMetricsOverride', {
-                'width': width,
-                'height': 812,
-                'deviceScaleFactor': 1,
-                'mobile': True
-            })
-
-            time.sleep(1.5)
-
-            expr = '''
-            (() => {
-              const firstEntry = document.querySelector('.search-results-list .entry');
-              const searchBox = document.querySelector('#article-search');
-              const statusText = document.querySelector('#filter-status-text');
-              const rect = firstEntry ? firstEntry.getBoundingClientRect() : null;
-              return {
-                width: window.innerWidth,
-                firstEntryTop: rect ? Math.round(rect.top) : null,
-                firstEntryFound: Boolean(firstEntry),
-                searchVisible: Boolean(searchBox),
-                status: statusText ? statusText.textContent : ''
-              };
-            })()
-            '''
-            res = send_cmd(10, 'Runtime.evaluate', {'expression': expr, 'returnByValue': True})
-            val = res['result']['result']['value']
-            ws.close()
-
-            assert val['searchVisible'], f"Search box not visible at {width}px"
-            assert "45" in val['status'], f"Active result count not 45 at {width}px: {val['status']}"
-            assert val['firstEntryFound'], f"First article entry not found at {width}px"
-            assert val['firstEntryTop'] is not None and val['firstEntryTop'] <= 450, (
-                f"First entry top {val['firstEntryTop']}px exceeds 450px budget at {width}px"
-            )
-            print(f"  ✓ Viewport {width}px: first entry top = {val['firstEntryTop']}px (<= 450px), search & count visible")
-        finally:
-            proc.terminate()
-            proc.wait()
-            httpd.shutdown()
-
-    # Desktop check: unfolded buttons at 1024px
-    with socket.socket() as s:
-        s.bind(('127.0.0.1', 0))
-        port = s.getsockname()[1]
-    with socket.socket() as s:
-        s.bind(('127.0.0.1', 0))
-        debug_port = s.getsockname()[1]
-
-    class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    class SilentHandler(http.server.SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=ROOT, **kwargs)
+
         def log_message(self, format, *args):
             pass
 
-    httpd = socketserver.TCPServer(('127.0.0.1', port), QuietHandler)
-    t = threading.Thread(target=httpd.serve_forever, daemon=True)
-    t.start()
+        def handle(self):
+            try:
+                super().handle()
+            except (BrokenPipeError, ConnectionResetError):
+                pass
 
-    proc = subprocess.Popen([
-        chrome_path,
-        '--headless=new',
-        '--disable-gpu',
-        f'--remote-debugging-port={debug_port}',
-        '--remote-allow-origins=*',
-        f'http://127.0.0.1:{port}/archive.html'
-    ], stderr=subprocess.DEVNULL)
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), SilentHandler)
+    port = server.server_address[1]
+    server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    server_thread.start()
 
+    base_url = f"http://127.0.0.1:{port}"
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("", 0))
+        debug_port = s.getsockname()[1]
+
+    node_script = f"""
+const {{ spawn }} = require('child_process');
+async function run() {{
+  const chrome = spawn('{chrome_bin}', [
+    '--headless=new',
+    '--disable-gpu',
+    '--remote-debugging-port={debug_port}'
+  ]);
+  await new Promise(r => setTimeout(r, 1200));
+  const res = await fetch('http://localhost:{debug_port}/json');
+  const tabs = await res.json();
+  const pageTab = tabs.find(t => t.type === 'page');
+  const ws = new WebSocket(pageTab.webSocketDebuggerUrl);
+
+  const send = (method, params = {{}}) => new Promise((resolve) => {{
+    const id = Math.floor(Math.random() * 100000);
+    const handler = (msg) => {{
+      const data = JSON.parse(msg.data);
+      if (data.id === id) {{
+        ws.removeEventListener('message', handler);
+        resolve(data.result);
+      }}
+    }};
+    ws.addEventListener('message', handler);
+    ws.send(JSON.stringify({{ id, method, params }}));
+  }});
+
+  ws.onopen = async () => {{
+    const results = {{}};
+
+    for (const width of [375, 608]) {{
+      await send('Emulation.setDeviceMetricsOverride', {{ width, height: 812, deviceScaleFactor: 1, mobile: true }});
+      await send('Page.navigate', {{ url: '{base_url}/archive.html?q=伊達判決' }});
+      await new Promise(r => setTimeout(r, 1000));
+
+      const evalRes = await send('Runtime.evaluate', {{
+        returnByValue: true,
+        expression: `(() => {{
+          const firstEntry = document.querySelector('.search-results-list .entry');
+          const searchBox = document.querySelector('#article-search');
+          const statusText = document.querySelector('#filter-status-text');
+          const rect = firstEntry ? firstEntry.getBoundingClientRect() : null;
+          return {{
+            width: window.innerWidth,
+            firstEntryTop: rect ? Math.round(rect.top) : null,
+            firstEntryFound: Boolean(firstEntry),
+            searchVisible: Boolean(searchBox),
+            status: statusText ? statusText.textContent : ''
+          }};
+        }})()`
+      }});
+      results[width] = evalRes.result.value;
+    }}
+
+    // Desktop 1024px
+    await send('Emulation.setDeviceMetricsOverride', {{ width: 1024, height: 800, deviceScaleFactor: 1, mobile: false }});
+    await send('Page.navigate', {{ url: '{base_url}/archive.html' }});
+    await new Promise(r => setTimeout(r, 1000));
+
+    const desktopEval = await send('Runtime.evaluate', {{
+      returnByValue: true,
+      expression: `(() => {{
+        const typeSummary = document.querySelector('.type-nav-summary');
+        const typeButtons = document.querySelector('.type-nav-buttons');
+        const buttons = [...document.querySelectorAll('.type-filter')];
+        return {{
+          typeSummaryDisplay: window.getComputedStyle(typeSummary).display,
+          typeButtonsDisplay: window.getComputedStyle(typeButtons).display,
+          typeButtonsCount: buttons.length,
+          allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0)
+        }};
+      }})()`
+    }});
+    results['desktop'] = desktopEval.result.value;
+
+    console.log(JSON.stringify(results));
+    ws.close();
+    chrome.kill();
+    process.exit(0);
+  }};
+}}
+run().catch(e => {{ console.error(e); process.exit(1); }});
+"""
     try:
-        time.sleep(1.0)
-        targets = json.loads(urllib.request.urlopen(f'http://127.0.0.1:{debug_port}/json').read().decode())
-        page_target = [tg for tg in targets if tg.get('type') == 'page'][0]
-        ws_url = page_target['webSocketDebuggerUrl']
-        ws = websocket.create_connection(ws_url)
+        proc = subprocess.run([node_bin, "-e", node_script], capture_output=True, text=True, check=True)
+        results = json.loads(proc.stdout.strip().splitlines()[-1])
+        for w in [375, 608]:
+            val = results[str(w)]
+            assert val['searchVisible'], f"Search box not visible at {w}px"
+            assert "45" in val['status'], f"Active result count not 45 at {w}px: {val['status']}"
+            assert val['firstEntryFound'], f"First article entry not found at {w}px"
+            assert val['firstEntryTop'] is not None and val['firstEntryTop'] <= 450, (
+                f"First entry top {val['firstEntryTop']}px exceeds 450px budget at {w}px"
+            )
+            print(f"  ✓ Viewport {w}px: first entry top = {val['firstEntryTop']}px (<= 450px), search & count visible")
 
-        def send_cmd(cmd_id, method, params=None):
-            msg = {'id': cmd_id, 'method': method}
-            if params:
-                msg['params'] = params
-            ws.send(json.dumps(msg))
-            while True:
-                r = json.loads(ws.recv())
-                if r.get('id') == cmd_id:
-                    return r
-
-        send_cmd(1, 'Emulation.setDeviceMetricsOverride', {
-            'width': 1024,
-            'height': 800,
-            'deviceScaleFactor': 1,
-            'mobile': False
-        })
-        time.sleep(1.5)
-
-        expr = '''
-        (() => {
-          const typeSummary = document.querySelector('.type-nav-summary');
-          const typeButtons = document.querySelector('.type-nav-buttons');
-          const buttons = [...document.querySelectorAll('.type-filter')];
-          return {
-            typeSummaryDisplay: window.getComputedStyle(typeSummary).display,
-            typeButtonsDisplay: window.getComputedStyle(typeButtons).display,
-            typeButtonsCount: buttons.length,
-            allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0)
-          };
-        })()
-        '''
-        res = send_cmd(10, 'Runtime.evaluate', {'expression': expr, 'returnByValue': True})
-        val = res['result']['result']['value']
-        ws.close()
-
-        assert val['typeSummaryDisplay'] == 'none', "Type summary should be hidden on desktop"
-        assert val['typeButtonsDisplay'] == 'flex', "Type buttons should be display: flex on desktop"
-        assert val['typeButtonsCount'] == 9, f"Expected 9 type buttons, found {val['typeButtonsCount']}"
-        assert val['allButtonsVisible'], "All 9 type buttons must be visible on desktop"
+        d_val = results['desktop']
+        assert d_val['typeSummaryDisplay'] == 'none', "Type summary should be hidden on desktop"
+        assert d_val['typeButtonsDisplay'] == 'flex', "Type buttons should be display: flex on desktop"
+        assert d_val['typeButtonsCount'] == 9, f"Expected 9 type buttons, found {d_val['typeButtonsCount']}"
+        assert d_val['allButtonsVisible'], "All 9 type buttons must be visible on desktop"
         print("  ✓ Desktop view (1024px): type buttons unfolded (display: flex) and all 9 buttons visible")
     finally:
-        proc.terminate()
-        proc.wait()
-        httpd.shutdown()
+        server.shutdown()
 
 if __name__ == '__main__':
     test_archive_html_structure()

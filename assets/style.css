@@ -266,6 +266,7 @@ h2 { line-height:1.4; }
 .search-results-list { margin:16px 0 32px; }
 #reset-filters { color:var(--accent); border:1px solid var(--line); border-radius:999px; padding:8px 12px; min-height:44px; background:var(--surface); font:inherit; cursor:pointer; }
 #reset-filters:hover { color:var(--accent-contrast); border-color:var(--accent); background:var(--accent); }
+.filter-reset-mobile { display:none; }
 .year-nav { margin:0; padding:0; }
 .year-nav-details { position:relative; width:auto; }
 .year-nav-summary { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:999px; background:var(--surface); color:var(--accent); font:inherit; font-weight:600; cursor:pointer; white-space:nowrap; }
@@ -434,6 +435,8 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
   .sort-control label { display:none; }
   .sort-control select { min-height:38px; padding:4px 6px; font-size:.82rem; }
   #reset-filters { min-height:38px; padding:4px 10px; font-size:.82rem; }
+  .filter-reset-desktop { display:none; }
+  .filter-reset-mobile { display:inline; }
   .year-nav-label, .language-nav-label, .type-nav-label { display:none; }
   .type-nav { margin:0 -20px 6px; padding:2px 20px 4px; border-bottom:1px solid var(--line); display:block; }
   .type-nav-buttons { display:flex; flex-wrap:wrap; gap:6px; padding:6px 0 4px; }
