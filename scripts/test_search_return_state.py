@@ -38,21 +38,32 @@ def test_static_archive_html():
         html = f.read()
 
     # AC 1: initial run must remember/sync archive_last_search
-    # Check that initial run does not disable remember (i.e. does not have `run(..., true, false)`)
-    # and that initial query params are stored to sessionStorage
-    assert not re.search(r'run\([^)]+,\s*true,\s*false\);', html), (
-        "archive.html initial run must not disable remember with 'false' (prevents sessionStorage sync)"
+    # Concrete wiring check for initial run with remember=true and Promise chain
+    assert re.search(
+        r'run\s*\(\s*initialLanguage,\s*initialYear,\s*initialType,\s*initial\.q,\s*initialSort,\s*true,\s*true\s*\)\.then\(',
+        html,
+    ), "archive.html must invoke run(initialLanguage, initialYear, initialType, initial.q, initialSort, true, true).then(...)"
+    assert "sessionStorage.setItem('archive_last_search'" in html, (
+        "archive.html must sync query string to sessionStorage.archive_last_search"
     )
-    assert "archive_last_search" in html, "archive.html must reference archive_last_search"
 
-    # AC 4: entry click tracking and restoration
-    assert "archive_last_article" in html, (
-        "archive.html must record clicked article to sessionStorage ('archive_last_article')"
+    # AC 4: entry click tracking and restoration concrete wiring
+    assert "document.addEventListener('click', saveClickedEntry)" in html, (
+        "archive.html must attach click listener for article entry tracking"
     )
-    assert "scrollIntoView" in html or "scrollTo" in html, (
-        "archive.html must restore position via scrollIntoView or scrollTo"
+    assert "document.addEventListener('auxclick', saveClickedEntry)" in html, (
+        "archive.html must attach auxclick listener for article entry tracking"
     )
-    print("  ✓ Static archive.html checks passed")
+    assert "sessionStorage.setItem('archive_last_article', href)" in html, (
+        "archive.html must record clicked article href into sessionStorage"
+    )
+    assert "sessionStorage.setItem('archive_last_scroll', String(window.scrollY))" in html, (
+        "archive.html must record scroll position into sessionStorage"
+    )
+    assert "targetEntry.scrollIntoView({ block: 'center'" in html, (
+        "archive.html must restore entry position using scrollIntoView({ block: 'center' })"
+    )
+    print("  ✓ Static archive.html concrete wiring checks passed")
 
 
 def find_free_port():
@@ -72,13 +83,11 @@ def test_live_browser_flow():
         chrome_bin = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
     if not chrome_bin:
-        print("Chrome binary not found; skipping headless browser test.")
-        return
+        raise RuntimeError("Google Chrome or Chromium is required for live browser tests. Chrome binary not found.")
 
     node_bin = shutil.which("node")
     if not node_bin:
-        print("Node binary not found; skipping headless browser test.")
-        return
+        raise RuntimeError("Node.js is required for headless browser automation. node binary not found.")
 
     port = find_free_port()
     debug_port = find_free_port()
