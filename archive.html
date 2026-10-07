@@ -617,18 +617,54 @@
     if (sortSelect) sortSelect.addEventListener('change', () => { const p = current(); run(p.language, p.year, p.type, p.q, sortSelect.value); });
     if (resetButton) resetButton.addEventListener('click', () => run('all', 'all', 'all', '', 'relevance'));
     if (noResultsReset) noResultsReset.addEventListener('click', () => run('all', 'all', 'all', '', 'relevance'));
+    const saveClickedEntry = (e) => {
+      const entry = e.target.closest('a.entry');
+      if (entry) {
+        try {
+          const href = entry.getAttribute('href') || '';
+          sessionStorage.setItem('archive_last_article', href);
+          sessionStorage.setItem('archive_last_scroll', String(window.scrollY));
+        } catch (err) {}
+      }
+    };
+    document.addEventListener('click', saveClickedEntry);
+    document.addEventListener('auxclick', saveClickedEntry);
+
+    const restoreTargetPosition = () => {
+      try {
+        const lastArticleHref = sessionStorage.getItem('archive_last_article');
+        const lastScroll = sessionStorage.getItem('archive_last_scroll');
+        sessionStorage.removeItem('archive_last_article');
+        sessionStorage.removeItem('archive_last_scroll');
+
+        if (lastArticleHref) {
+          const targetEntry = entries.find((e) => e.getAttribute('href') === lastArticleHref && !e.hidden);
+          if (targetEntry) {
+            targetEntry.scrollIntoView({ block: 'center', behavior: 'auto' });
+            return;
+          }
+        }
+        if (lastScroll) {
+          const y = parseInt(lastScroll, 10);
+          if (!isNaN(y) && y > 0) {
+            window.scrollTo({ top: y, behavior: 'auto' });
+          }
+        }
+      } catch (err) {}
+    };
+
     const initial = current();
     const initialLanguage = languageButtons.some((button) => button.dataset.languageFilter === initial.language) ? initial.language : 'all';
     const initialYear = yearButtons.some((button) => button.dataset.yearFilter === initial.year) ? initial.year : 'all';
     const initialType = typeButtons.some((button) => button.dataset.typeFilter === initial.type) ? initial.type : 'all';
     const initialSort = initial.sort === 'date' ? 'date' : 'relevance';
-    // The first render syncs the address bar so a shared link that asks for a
-    // combination which cannot exist (e.g. a year with no articles left after the
-    // other filters) is rewritten to match what is actually shown — otherwise the
-    // link and the visible results disagree. It does not store the state for the
-    // article pages' "back to the list" link; that stays tied to the visitor's own
-    // filter changes.
-    run(initialLanguage, initialYear, initialType, initial.q, initialSort, true, false);
+
+    // The first render syncs the address bar and records search state to sessionStorage
+    // so article pages' "back to the list" link preserves the current search parameters.
+    // Upon render completion, if returning from an article, position is restored.
+    run(initialLanguage, initialYear, initialType, initial.q, initialSort, true, true).then(() => {
+      requestAnimationFrame(restoreTargetPosition);
+    });
     const syncFilterPanels = () => {
       const isDesktop = !filterNavIsCompact();
       if (yearPanel) yearPanel.open = false;
