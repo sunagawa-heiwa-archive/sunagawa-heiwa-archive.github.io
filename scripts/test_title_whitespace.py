@@ -6,9 +6,10 @@ Verifies:
 1. All 208 article titles in archive.html have no consecutive whitespace (half-width or full-width ideographic).
 2. Specifically checks 2023-09-14 ameblo-12820410904 title whitespace collapse.
 3. Punctuation, Japanese/English characters, dates, and order preserved.
-4. Zero changes to articles/ or raw/ directory (AC 5).
-5. Search matching and highlighting works with normalized title.
-6. Live headless Chrome viewport checks at 320px, 375px, and desktop for zero horizontal overflow.
+4. Zero changes to articles/ or raw/ directory, byte-identical to origin/main (AC 5).
+5. Search matching and keyword highlighting work with normalized title.
+6. Live headless Chrome viewport checks at 320px, 375px, and desktop for zero horizontal overflow,
+   browse mode compact ellipsis (SITES-23), and search mode natural title wrapping (AC 3 & AC 4).
 """
 
 import http.server
@@ -105,13 +106,20 @@ def test_target_article_title_normalization():
 
 
 def test_articles_and_raw_untouched():
-    """AC 5: Ensure articles/ and raw/ files are completely unmodified."""
+    """AC 5: Ensure articles/ and raw/ files are completely unmodified and byte-identical to origin/main."""
+    # 1. Assert git diff against origin/main for articles/ and raw/ is clean
+    res = subprocess.run(["git", "diff", "--quiet", "origin/main", "--", "articles", "raw"], cwd=ROOT)
+    assert res.returncode == 0, "articles/ or raw/ directory has differences versus origin/main!"
+
+    # 2. Specifically assert target article retains original 8 consecutive ideographic spaces
     target_article = os.path.join(ROOT, "articles", "ameblo-12820410904.html")
     assert os.path.isfile(target_article), "Target article file missing"
     with open(target_article, "r", encoding="utf-8") as f:
         content = f.read()
-    # Ensure article body and h1 retain original content without mutation
-    assert "砂川平和ひろば主催 10.14集会" in content, "Article title corrupted in articles/*.html"
+    assert "\u3000\u3000\u3000\u3000\u3000\u3000\u3000\u3000" in content, (
+        "Original 8 full-width spaces must be preserved byte-identical in archived article page"
+    )
+    print("  ✓ articles/ and raw/ confirmed 100% byte-identical to origin/main with raw spaces preserved")
 
 
 def test_live_viewport_and_search_highlight():
@@ -177,7 +185,7 @@ async function run() {{
   ws.onopen = async () => {{
     const results = {{}};
 
-    // 1. Check responsive viewports for horizontal overflow
+    // 1. Check responsive viewports for horizontal overflow and browse-mode compact ellipsis
     for (const width of [320, 375, 1024]) {{
       await send('Emulation.setDeviceMetricsOverride', {{ width, height: 800, deviceScaleFactor: 1, mobile: width < 700 }});
       await send('Page.navigate', {{ url: '{base_url}/archive.html' }});
@@ -186,17 +194,23 @@ async function run() {{
       const evalRes = await send('Runtime.evaluate', {{
         returnByValue: true,
         expression: `(() => {{
+          const targetEntry = document.querySelector('a.entry[href*="12820410904"]');
+          const titleEl = targetEntry ? targetEntry.querySelector('.entry-title') : null;
+          const titleStyle = titleEl ? window.getComputedStyle(titleEl) : null;
           return {{
             width: window.innerWidth,
             scrollWidth: document.documentElement.scrollWidth,
-            hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
+            hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+            browseWhiteSpace: titleStyle ? titleStyle.whiteSpace : '',
+            browseTextOverflow: titleStyle ? titleStyle.textOverflow : '',
+            browseTruncated: titleEl ? titleEl.scrollWidth > titleEl.clientWidth : false
           }};
         }})()`
       }});
       results[width] = evalRes.result.value;
     }}
 
-    // 2. Check search highlighting on normalized title
+    // 2. Check search mode: keyword highlight and natural title wrapping without truncation
     await send('Emulation.setDeviceMetricsOverride', {{ width: 375, height: 800, deviceScaleFactor: 1, mobile: true }});
     await send('Page.navigate', {{ url: '{base_url}/archive.html?q=多摩の水汚染' }});
     await new Promise(r => setTimeout(r, 1200));
@@ -206,12 +220,15 @@ async function run() {{
       expression: `(() => {{
         const targetEntry = document.querySelector('a.entry[href*="12820410904"]');
         const titleEl = targetEntry ? targetEntry.querySelector('.entry-title') : null;
+        const titleStyle = titleEl ? window.getComputedStyle(titleEl) : null;
         const mark = titleEl ? titleEl.querySelector('mark.search-highlight') : null;
         return {{
           entryFound: Boolean(targetEntry),
           titleText: titleEl ? titleEl.textContent : '',
           markFound: Boolean(mark),
-          markText: mark ? mark.textContent : ''
+          markText: mark ? mark.textContent : '',
+          searchWhiteSpace: titleStyle ? titleStyle.whiteSpace : '',
+          searchOverflow: titleStyle ? titleStyle.overflow : ''
         }};
       }})()`
     }});
@@ -234,11 +251,21 @@ run().catch(e => {{ console.error(e); process.exit(1); }});
             assert not val['hasHorizontalOverflow'], f"Horizontal overflow detected at {w}px: scrollWidth={val['scrollWidth']}"
             print(f"  ✓ Viewport {w}px: zero horizontal overflow (scrollWidth {val['scrollWidth']}px <= {w}px)")
 
+        # Verify browse mode compact ellipsis behavior (as established by SITES-23)
+        b375 = results['375']
+        assert b375['browseWhiteSpace'] == 'nowrap', "Browse mode must use nowrap"
+        assert b375['browseTextOverflow'] == 'ellipsis', "Browse mode must use ellipsis"
+        assert b375['browseTruncated'], "Long title at 375px should truncate with ellipsis in browse mode"
+        print("  ✓ Browse mode (375px): compact ellipsis truncation confirmed (SITES-23 format)")
+
+        # Verify search mode wraps naturally without truncation
         s_val = results['search']
         assert s_val['entryFound'], "Search for '多摩の水汚染' did not find target entry ameblo-12820410904"
         assert s_val['markFound'], "Search keyword '多摩の水汚染' was not highlighted in title"
         assert s_val['markText'] == "多摩の水汚染", f"Unexpected highlight text: {s_val['markText']}"
-        print("  ✓ Search matching & keyword highlight in normalized title verified")
+        assert s_val['searchWhiteSpace'] == 'normal', "Search mode must allow natural title wrapping (white-space: normal)"
+        assert s_val['searchOverflow'] == 'visible', "Search mode must display full title (overflow: visible)"
+        print("  ✓ Search mode (375px): title wraps naturally without truncation and keyword is highlighted")
     finally:
         server.shutdown()
 

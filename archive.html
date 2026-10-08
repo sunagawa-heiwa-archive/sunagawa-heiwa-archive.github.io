@@ -435,7 +435,7 @@
 
         const titleEl = entry.querySelector('.entry-title');
         if (!titleEl) return;
-        if (!titleEl.dataset.origText) titleEl.dataset.origText = titleEl.textContent.replace(/[\s\u3000]+/g, ' ').trim();
+        if (!titleEl.dataset.origText) titleEl.dataset.origText = titleEl.textContent;
 
         const existingSnippet = entry.querySelector('.search-snippet');
 
