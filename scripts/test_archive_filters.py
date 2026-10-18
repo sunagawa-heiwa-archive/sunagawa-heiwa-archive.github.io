@@ -236,7 +236,7 @@ def test_javascript_behavior():
     print("  ✓ URL parameter compatibility (type, year, language) verified on refresh and sharing")
 
 def test_live_viewport_above_the_fold():
-    print("Testing live browser viewport height and search controls at 375px & 608px (AC 2 & AC 3)...")
+    print("Testing live browser viewport height and search controls at 320px, 375px & 608px (AC 2 & AC 3)...")
     chrome_bin = (
         shutil.which("google-chrome")
         or shutil.which("chromium")
@@ -305,7 +305,7 @@ async function run() {{
   ws.onopen = async () => {{
     const results = {{}};
 
-    for (const width of [375, 608]) {{
+    for (const width of [375, 608, 320]) {{
       await send('Emulation.setDeviceMetricsOverride', {{ width, height: 812, deviceScaleFactor: 1, mobile: true }});
       await send('Page.navigate', {{ url: '{base_url}/archive.html?q=伊達判決' }});
       await new Promise(r => setTimeout(r, 1000));
@@ -318,6 +318,7 @@ async function run() {{
           const statusText = document.querySelector('#filter-status-text');
           const yearDetails = document.querySelector('.year-nav-details');
           const yearLabel = document.querySelector('#year-nav-current');
+          const visibleYearLabel = [...yearLabel.children].find(label => window.getComputedStyle(label).display !== 'none');
           yearDetails.open = true;
           const yearPanel = document.querySelector('.year-nav-buttons');
           const yearPanelRect = yearPanel.getBoundingClientRect();
@@ -336,9 +337,10 @@ async function run() {{
             firstEntryFound: Boolean(firstEntry),
             searchVisible: Boolean(searchBox),
             searchWidth: searchBox ? Math.round(searchBox.getBoundingClientRect().width) : 0,
+            searchPlaceholder: searchBox ? searchBox.placeholder : '',
             searchPlaceholderFits: placeholderTextWidth <= placeholderContentWidth,
-            yearLabel: yearLabel ? yearLabel.textContent : '',
-            yearLabelFits: Boolean(yearLabel && yearLabel.scrollWidth <= yearLabel.clientWidth),
+            yearLabel: visibleYearLabel ? visibleYearLabel.textContent : '',
+            yearLabelFits: Boolean(visibleYearLabel && visibleYearLabel.scrollWidth <= visibleYearLabel.clientWidth),
             yearPanelWithinViewport: yearPanelRect.left >= 0 && yearPanelRect.right <= window.innerWidth,
             yearButtonCount: yearButtons.length,
             yearButtonsHitTestable: yearButtons.every(button => {{
@@ -364,6 +366,7 @@ async function run() {{
         const typeSummary = document.querySelector('.type-nav-summary');
         const typeButtons = document.querySelector('.type-nav-buttons');
         const buttons = [...document.querySelectorAll('.type-filter')];
+        const searchPlaceholder = document.querySelector('#article-search').placeholder;
         const noteEl = document.querySelector('p.year-gap.note');
         const noteRect = noteEl ? noteEl.getBoundingClientRect() : null;
         const notePointEl = noteRect ? document.elementFromPoint(noteRect.left + 5, noteRect.top + 5) : null;
@@ -371,6 +374,7 @@ async function run() {{
           typeSummaryDisplay: window.getComputedStyle(typeSummary).display,
           typeButtonsDisplay: window.getComputedStyle(typeButtons).display,
           typeButtonsCount: buttons.length,
+          searchPlaceholder,
           allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0),
           noteVisible: Boolean(noteRect && noteRect.height > 0 && (notePointEl === noteEl || (noteEl && noteEl.contains(notePointEl))))
         }};
@@ -390,30 +394,43 @@ run().catch(e => {{ console.error(e); process.exit(1); }});
         proc = subprocess.run([node_bin, "-e", node_script], capture_output=True, text=True)
         assert proc.returncode == 0, f"Browser viewport check failed:\n{proc.stderr}\n{proc.stdout}"
         results = json.loads(proc.stdout.strip().splitlines()[-1])
-        for w in [375, 608]:
+        for w in [375, 608, 320]:
             val = results[str(w)]
             assert val['searchVisible'], f"Search box not visible at {w}px"
             if w == 375:
                 assert val['searchWidth'] >= 180, (
                     f"Search box is only {val['searchWidth']}px wide at 375px; expected at least 180px"
                 )
-                assert val['searchPlaceholderFits'], "Search placeholder does not fit inside the 375px search field"
-                assert val['yearLabelFits'], f"Year label is clipped at 375px: {val['yearLabel']}"
-                assert val['yearPanelWithinViewport'], "Year filter panel extends beyond the 375px viewport"
+            if w in [320, 375]:
+                assert val['searchPlaceholder'] == '記事検索 / Search', (
+                    f"Unexpected compact search placeholder at {w}px: {val['searchPlaceholder']}"
+                )
+                assert val['searchPlaceholderFits'], f"Search placeholder does not fit at {w}px"
+                assert val['yearLabelFits'], f"Year label is clipped at {w}px: {val['yearLabel']}"
+                assert val['yearPanelWithinViewport'], f"Year filter panel extends beyond the {w}px viewport"
                 assert val['yearButtonCount'] == 14, f"Expected 14 year options, found {val['yearButtonCount']}"
-                assert val['yearButtonsHitTestable'], "One or more year options are clipped or not hit-testable at 375px"
+                assert val['yearButtonsHitTestable'], f"One or more year options are clipped or not hit-testable at {w}px"
+            if w == 375:
                 print(f"  ✓ Viewport 375px: search = {val['searchWidth']}px, year label fits, all 14 options stay in view and are tappable")
+            if w == 320:
+                print(f"  ✓ Viewport 320px: search placeholder and year label fit, all 14 options stay in view and are tappable")
             assert "45" in val['status'], f"Active result count not 45 at {w}px: {val['status']}"
             assert val['firstEntryFound'], f"First article entry not found at {w}px"
-            assert val['firstEntryTop'] is not None and val['firstEntryTop'] <= 450, (
-                f"First entry top {val['firstEntryTop']}px exceeds 450px budget at {w}px"
-            )
-            print(f"  ✓ Viewport {w}px: first entry top = {val['firstEntryTop']}px (<= 450px), search & count visible")
+            if w in [375, 608]:
+                assert val['firstEntryTop'] is not None and val['firstEntryTop'] <= 450, (
+                    f"First entry top {val['firstEntryTop']}px exceeds 450px budget at {w}px"
+                )
+                print(f"  ✓ Viewport {w}px: first entry top = {val['firstEntryTop']}px (<= 450px), search & count visible")
+            else:
+                print(f"  ✓ Viewport {w}px: search controls fit; first result top = {val['firstEntryTop']}px")
 
         d_val = results['desktop']
         assert d_val['typeSummaryDisplay'] == 'none', "Type summary should be hidden on desktop"
         assert d_val['typeButtonsDisplay'] == 'flex', "Type buttons should be display: flex on desktop"
         assert d_val['typeButtonsCount'] == 9, f"Expected 9 type buttons, found {d_val['typeButtonsCount']}"
+        assert d_val['searchPlaceholder'] == 'Search titles and article text / タイトル・本文を検索', (
+            f"Desktop search placeholder should retain its full label: {d_val['searchPlaceholder']}"
+        )
         assert d_val['allButtonsVisible'], "All 9 type buttons must be visible on desktop"
         assert d_val['noteVisible'], "Archive note text ('収録メモ') must be rendered and visible on desktop"
         print("  ✓ Desktop view (1024px): type buttons unfolded (display: flex), all 9 buttons visible, archive note rendered")
