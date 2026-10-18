@@ -340,7 +340,9 @@ async function run() {{
             searchPlaceholder: searchBox ? searchBox.placeholder : '',
             searchPlaceholderFits: placeholderTextWidth <= placeholderContentWidth,
             yearLabel: visibleYearLabel ? visibleYearLabel.textContent : '',
-            yearLabelFits: Boolean(visibleYearLabel && visibleYearLabel.scrollWidth <= visibleYearLabel.clientWidth),
+            yearLabelContentWidth: visibleYearLabel ? visibleYearLabel.scrollWidth : 0,
+            yearLabelClientWidth: visibleYearLabel ? visibleYearLabel.clientWidth : 0,
+            yearLabelFits: Boolean(visibleYearLabel && window.getComputedStyle(visibleYearLabel).display === 'block' && visibleYearLabel.clientWidth > 0 && visibleYearLabel.scrollWidth <= visibleYearLabel.clientWidth),
             yearPanelWithinViewport: yearPanelRect.left >= 0 && yearPanelRect.right <= window.innerWidth,
             yearButtonCount: yearButtons.length,
             yearButtonsHitTestable: yearButtons.every(button => {{
@@ -367,6 +369,7 @@ async function run() {{
         const typeButtons = document.querySelector('.type-nav-buttons');
         const buttons = [...document.querySelectorAll('.type-filter')];
         const searchPlaceholder = document.querySelector('#article-search').placeholder;
+        const yearDesktopLabel = document.querySelector('.year-nav-current-desktop');
         const noteEl = document.querySelector('p.year-gap.note');
         const noteRect = noteEl ? noteEl.getBoundingClientRect() : null;
         const notePointEl = noteRect ? document.elementFromPoint(noteRect.left + 5, noteRect.top + 5) : null;
@@ -375,6 +378,8 @@ async function run() {{
           typeButtonsDisplay: window.getComputedStyle(typeButtons).display,
           typeButtonsCount: buttons.length,
           searchPlaceholder,
+          yearDesktopLabel: yearDesktopLabel.textContent,
+          yearDesktopLabelVisible: window.getComputedStyle(yearDesktopLabel).display !== 'none',
           allButtonsVisible: buttons.every(b => b.getBoundingClientRect().height > 0),
           noteVisible: Boolean(noteRect && noteRect.height > 0 && (notePointEl === noteEl || (noteEl && noteEl.contains(notePointEl))))
         }};
@@ -431,6 +436,10 @@ run().catch(e => {{ console.error(e); process.exit(1); }});
         assert d_val['searchPlaceholder'] == 'Search titles and article text / タイトル・本文を検索', (
             f"Desktop search placeholder should retain its full label: {d_val['searchPlaceholder']}"
         )
+        assert d_val['yearDesktopLabel'] == 'All years / すべての年 · 208', (
+            f"Desktop year label should retain its full label: {d_val['yearDesktopLabel']}"
+        )
+        assert d_val['yearDesktopLabelVisible'], "Full year label should remain visible on desktop"
         assert d_val['allButtonsVisible'], "All 9 type buttons must be visible on desktop"
         assert d_val['noteVisible'], "Archive note text ('収録メモ') must be rendered and visible on desktop"
         print("  ✓ Desktop view (1024px): type buttons unfolded (display: flex), all 9 buttons visible, archive note rendered")

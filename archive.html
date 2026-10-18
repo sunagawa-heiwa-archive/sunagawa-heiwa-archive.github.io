@@ -576,12 +576,11 @@
       }
       if (yearCurrent) {
         const count = visibleEntries.length;
-        const selectedYear = year === 'all' ? 'All / すべて' : year;
         yearCurrent.querySelector('.year-nav-current-desktop').textContent = year === 'all'
           ? `All years / すべての年 · ${count}`
           : `${year} · ${count}`;
-        yearCurrent.querySelector('.year-nav-current-mobile').textContent = `Year/年 · ${year === 'all' ? 'All/すべて' : year} · ${count}`;
-        yearCurrent.querySelector('.year-nav-current-narrow').textContent = `Year/年 · ${year === 'all' ? count : `${year} · ${count}`}`;
+        yearCurrent.querySelector('.year-nav-current-mobile').textContent = `Year/年 · ${year === 'all' ? 'All/すべて' : year}`;
+        yearCurrent.querySelector('.year-nav-current-narrow').textContent = `年 · ${year === 'all' ? 'All/すべて' : year}`;
       }
       if (languageCurrent) {
         const langLabel = language === 'all'
