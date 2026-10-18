@@ -236,7 +236,7 @@ def test_javascript_behavior():
     print("  ✓ URL parameter compatibility (type, year, language) verified on refresh and sharing")
 
 def test_live_viewport_above_the_fold():
-    print("Testing live browser viewport height budget at 375px & 608px (AC 2 & AC 3)...")
+    print("Testing live browser viewport height and search controls at 375px & 608px (AC 2 & AC 3)...")
     chrome_bin = (
         shutil.which("google-chrome")
         or shutil.which("chromium")
@@ -316,12 +316,36 @@ async function run() {{
           const firstEntry = document.querySelector('.search-results-list .entry');
           const searchBox = document.querySelector('#article-search');
           const statusText = document.querySelector('#filter-status-text');
+          const yearDetails = document.querySelector('.year-nav-details');
+          const yearLabel = document.querySelector('#year-nav-current');
+          yearDetails.open = true;
+          const yearPanel = document.querySelector('.year-nav-buttons');
+          const yearPanelRect = yearPanel.getBoundingClientRect();
+          const yearButtons = [...yearPanel.querySelectorAll('.year-link')];
+          const searchStyle = window.getComputedStyle(searchBox);
+          const placeholderCanvas = document.createElement('canvas');
+          const placeholderContext = placeholderCanvas.getContext('2d');
+          placeholderContext.font = searchStyle.font;
+          const placeholderTextWidth = placeholderContext.measureText(searchBox.placeholder).width;
+          const placeholderContentWidth = searchBox.clientWidth
+            - parseFloat(searchStyle.paddingLeft) - parseFloat(searchStyle.paddingRight);
           const rect = firstEntry ? firstEntry.getBoundingClientRect() : null;
           return {{
             width: window.innerWidth,
             firstEntryTop: rect ? Math.round(rect.top) : null,
             firstEntryFound: Boolean(firstEntry),
             searchVisible: Boolean(searchBox),
+            searchWidth: searchBox ? Math.round(searchBox.getBoundingClientRect().width) : 0,
+            searchPlaceholderFits: placeholderTextWidth <= placeholderContentWidth,
+            yearLabel: yearLabel ? yearLabel.textContent : '',
+            yearLabelFits: Boolean(yearLabel && yearLabel.scrollWidth <= yearLabel.clientWidth),
+            yearPanelWithinViewport: yearPanelRect.left >= 0 && yearPanelRect.right <= window.innerWidth,
+            yearButtonCount: yearButtons.length,
+            yearButtonsHitTestable: yearButtons.every(button => {{
+              const buttonRect = button.getBoundingClientRect();
+              const target = document.elementFromPoint(buttonRect.left + buttonRect.width / 2, buttonRect.top + buttonRect.height / 2);
+              return buttonRect.left >= 0 && buttonRect.right <= window.innerWidth && target && target.closest('.year-link') === button;
+            }}),
             status: statusText ? statusText.textContent : ''
           }};
         }})()`
@@ -363,11 +387,22 @@ async function run() {{
 run().catch(e => {{ console.error(e); process.exit(1); }});
 """
     try:
-        proc = subprocess.run([node_bin, "-e", node_script], capture_output=True, text=True, check=True)
+        proc = subprocess.run([node_bin, "-e", node_script], capture_output=True, text=True)
+        assert proc.returncode == 0, f"Browser viewport check failed:\n{proc.stderr}\n{proc.stdout}"
         results = json.loads(proc.stdout.strip().splitlines()[-1])
         for w in [375, 608]:
             val = results[str(w)]
             assert val['searchVisible'], f"Search box not visible at {w}px"
+            if w == 375:
+                assert val['searchWidth'] >= 180, (
+                    f"Search box is only {val['searchWidth']}px wide at 375px; expected at least 180px"
+                )
+                assert val['searchPlaceholderFits'], "Search placeholder does not fit inside the 375px search field"
+                assert val['yearLabelFits'], f"Year label is clipped at 375px: {val['yearLabel']}"
+                assert val['yearPanelWithinViewport'], "Year filter panel extends beyond the 375px viewport"
+                assert val['yearButtonCount'] == 14, f"Expected 14 year options, found {val['yearButtonCount']}"
+                assert val['yearButtonsHitTestable'], "One or more year options are clipped or not hit-testable at 375px"
+                print(f"  ✓ Viewport 375px: search = {val['searchWidth']}px, year label fits, all 14 options stay in view and are tappable")
             assert "45" in val['status'], f"Active result count not 45 at {w}px: {val['status']}"
             assert val['firstEntryFound'], f"First article entry not found at {w}px"
             assert val['firstEntryTop'] is not None and val['firstEntryTop'] <= 450, (
