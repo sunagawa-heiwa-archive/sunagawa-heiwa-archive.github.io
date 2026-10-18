@@ -420,12 +420,14 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
   .note-details p.note { margin:4px 0 6px; font-size:.82rem; line-height:1.45; }
   body.archive-page.has-search .stats { display:none; }
   .sticky-bar { display:contents; }
-  .sticky-bar-main { position:sticky; top:0; z-index:20; background:var(--paper); border-bottom:1px solid var(--line); margin:0 -20px; padding:0 16px; display:flex; flex-direction:column; align-items:stretch; gap:0; }
-  .sticky-bar-main .search { min-width:0; width:100%; }
+  .sticky-bar-main { position:sticky; top:0; z-index:20; background:var(--paper); border-bottom:1px solid var(--line); margin:0 -20px 4px; padding:4px 16px; display:flex; align-items:center; gap:8px; }
+  .sticky-bar-main .search { flex:1; min-width:0; }
   .sticky-bar-main .search input { width:100%; min-height:44px; padding:8px 10px; font-size:.92rem; }
-  .sticky-bar-main .year-nav { flex-shrink:0; align-self:flex-start; padding:0; margin:0; border:none; }
-  .sticky-bar-main .year-nav-summary { min-height:44px; padding:6px 12px; font-size:.88rem; }
-  .sticky-bar-main .year-nav-details[open] .year-nav-buttons { position:absolute; top:calc(100% + 6px); left:0; right:auto; width:min(340px, 92vw); padding:10px; gap:6px; }
+  .sticky-bar-main .year-nav { flex:0 0 136px; min-width:0; padding:0; margin:0; border:none; }
+  .sticky-bar-main .year-nav-details { width:100%; min-width:0; }
+  .sticky-bar-main .year-nav-summary { min-width:0; min-height:44px; padding:4px 6px; gap:4px; font-size:.72rem; line-height:1; white-space:nowrap; }
+  .sticky-bar-main .year-nav-summary span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .sticky-bar-main .year-nav-details[open] .year-nav-buttons { position:absolute; top:calc(100% + 6px); left:auto; right:0; width:min(340px, 92vw); padding:10px; gap:6px; }
   .filter-status { align-items:flex-start; flex-direction:column; margin:2px 0 4px; }
   #filter-status-text { font-size:.86rem; line-height:1.35; margin:0 0 4px; }
   .filter-actions { width:100%; display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap; }
