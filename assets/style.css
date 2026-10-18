@@ -270,6 +270,7 @@ h2 { line-height:1.4; }
 .year-nav { margin:0; padding:0; }
 .year-nav-details { position:relative; width:auto; }
 .year-nav-summary { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:999px; background:var(--surface); color:var(--accent); font:inherit; font-weight:600; cursor:pointer; white-space:nowrap; }
+.year-nav-current-mobile, .year-nav-current-narrow { display:none; }
 .year-nav-summary:hover { border-color:var(--accent); }
 .year-nav-summary::-webkit-details-marker, .year-nav-summary::marker { display:none; content:""; }
 .year-nav-summary::after { content:""; width:.4em; height:.4em; margin-left:4px; border-right:2px solid var(--accent); border-bottom:2px solid var(--accent); transform:rotate(45deg); flex-shrink:0; }
@@ -423,8 +424,12 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
   .sticky-bar-main { position:sticky; top:0; z-index:20; background:var(--paper); border-bottom:1px solid var(--line); margin:0 -20px 4px; padding:4px 16px; display:flex; align-items:center; gap:8px; }
   .sticky-bar-main .search { flex:1; min-width:0; }
   .sticky-bar-main .search input { width:100%; min-height:44px; padding:8px 10px; font-size:.92rem; }
-  .sticky-bar-main .year-nav { flex-shrink:0; padding:0; margin:0; border:none; }
-  .sticky-bar-main .year-nav-summary { min-height:44px; padding:6px 12px; font-size:.88rem; }
+  .sticky-bar-main .year-nav { flex:0 0 154px; min-width:0; padding:0; margin:0; border:none; }
+  .sticky-bar-main .year-nav-details { width:100%; min-width:0; }
+  .sticky-bar-main .year-nav-summary { min-width:0; min-height:44px; padding:4px; gap:3px; font-size:.78rem; line-height:1; white-space:nowrap; }
+  .sticky-bar-main .year-nav-summary > #year-nav-current { display:block; flex:1; min-width:0; white-space:nowrap; }
+  .sticky-bar-main #year-nav-current > .year-nav-current-desktop { display:none; }
+  .sticky-bar-main #year-nav-current > .year-nav-current-mobile { display:block; white-space:nowrap; }
   .sticky-bar-main .year-nav-details[open] .year-nav-buttons { position:absolute; top:calc(100% + 6px); left:auto; right:0; width:min(340px, 92vw); padding:10px; gap:6px; }
   .filter-status { align-items:flex-start; flex-direction:column; margin:4px 0 6px; }
   #filter-status-text { font-size:.86rem; line-height:1.35; margin:0 0 4px; }
@@ -452,6 +457,12 @@ footer { color:var(--muted); font-size:.88rem; margin-top:28px; }
   .year-section, .entry { scroll-margin-top:170px; }
   .article-nav { grid-template-columns:1fr; }
   .article-nav-older, .article-nav-newer { grid-column:1; text-align:left; }
+}
+
+@media (max-width:360px) {
+  .sticky-bar-main .year-nav { flex-basis:124px; }
+  .sticky-bar-main #year-nav-current > .year-nav-current-mobile { display:none; }
+  .sticky-bar-main #year-nav-current > .year-nav-current-narrow { display:block; white-space:nowrap; }
 }
 @media (prefers-reduced-motion:reduce) {
   html { scroll-behavior:auto; }
